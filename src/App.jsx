@@ -37,6 +37,22 @@ export default function App() {
     refresh()
   }, [refresh])
 
+  // Cross-device sync: re-pull the latest data whenever the tab regains focus
+  // (e.g. you switch back after editing on your phone). Only meaningful with
+  // the Supabase backend, so we skip it for the local-only fallback.
+  useEffect(() => {
+    if (!storage.isCloud) return
+    const onFocus = () => {
+      if (document.visibilityState === 'visible') refresh()
+    }
+    document.addEventListener('visibilitychange', onFocus)
+    window.addEventListener('focus', onFocus)
+    return () => {
+      document.removeEventListener('visibilitychange', onFocus)
+      window.removeEventListener('focus', onFocus)
+    }
+  }, [refresh])
+
   const plannedIds = useMemo(
     () => new Set(planner.map((e) => e.recipeId)),
     [planner],

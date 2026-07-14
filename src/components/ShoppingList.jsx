@@ -37,8 +37,10 @@ export default function ShoppingList({ planner, recipes, onBack }) {
   const doneCount = items.filter((it) => checked[it.key]).length
 
   const copy = async () => {
+    // Only copy what's still needed — skip items already ticked off.
+    const remaining = items.filter((it) => !checked[it.key])
     try {
-      await navigator.clipboard.writeText(shoppingListToText(items))
+      await navigator.clipboard.writeText(shoppingListToText(remaining))
       setCopied(true)
       setTimeout(() => setCopied(false), 1500)
     } catch {
