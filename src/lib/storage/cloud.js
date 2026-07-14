@@ -1,0 +1,89 @@
+// Supabase backend. A single shared recipe collection (no login) so the same
+// data appears on every device. Row shape in the `recipes` table:
+//   id (uuid, pk) | title (text) | category (text) | image_url (text)
+//   | blocks (jsonb) | created_at (timestamptz) | updated_at (timestamptz)
+// Images live in the public storage bucket named by IMAGE_BUCKET.
+
+import { createClient } from '@supabase/supabase-js'
+import {
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
+  IMAGE_BUCKET,
+  isCloudConfigured,
+} from '../config'
+import { uid } from '../uid'
+
+// Only build the client when configured — createClient throws on an empty URL,
+// and this module is imported eagerly by the backend selector.
+const supabase = isCloudConfigured
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+  : null
+
+function rowToRecipe(row) {
+  return {
+    id: row.id,
+    title: row.title || '',
+    category: row.category || 'lunch',
+    image: row.image_url || null,
+    blocks: row.blocks || [],
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  }
+}
+
+function recipeToRow(recipe) {
+  return {
+    id: recipe.id,
+    title: recipe.title,
+    category: recipe.category,
+    image_url: recipe.image || null,
+    blocks: recipe.blocks || [],
+    updated_at: new Date().toISOString(),
+  }
+}
+
+export async function listRecipes() {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .order('created_at', { ascending: false })
+  if (error) throw error
+  return (data || []).map(rowToRecipe)
+}
+
+export async function getRecipe(id) {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+  if (error) throw error
+  return data ? rowToRecipe(data) : null
+}
+
+export async function saveRecipe(recipe) {
+  const row = recipeToRow(recipe)
+  const { data, error } = await supabase
+    .from('recipes')
+    .upsert(row, { onConflict: 'id' })
+    .select()
+    .single()
+  if (error) throw error
+  return rowToRecipe(data)
+}
+
+export async function deleteRecipe(id) {
+  const { error } = await supabase.from('recipes').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function uploadImage(file) {
+  const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase()
+  const path = `${uid()}.${ext}`
+  const { error } = await supabase.storage
+    .from(IMAGE_BUCKET)
+    .upload(path, file, { cacheControl: '3600', upsert: false })
+  if (error) throw error
+  const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path)
+  return data.publicUrl
+}
