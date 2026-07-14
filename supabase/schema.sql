@@ -37,7 +37,26 @@ create policy "public write recipes"  on public.recipes for insert with check (t
 create policy "public update recipes" on public.recipes for update using (true) with check (true);
 create policy "public delete recipes" on public.recipes for delete using (true);
 
--- 2) Public image bucket --------------------------------------------------------
+-- 2) Planner table (recipes to cook soon) ---------------------------------------
+create table if not exists public.planner (
+  recipe_id  uuid primary key references public.recipes (id) on delete cascade,
+  portions   integer not null default 1,
+  added_at   timestamptz not null default now()
+);
+
+alter table public.planner enable row level security;
+
+drop policy if exists "public read planner"   on public.planner;
+drop policy if exists "public write planner"  on public.planner;
+drop policy if exists "public update planner" on public.planner;
+drop policy if exists "public delete planner" on public.planner;
+
+create policy "public read planner"   on public.planner for select using (true);
+create policy "public write planner"  on public.planner for insert with check (true);
+create policy "public update planner" on public.planner for update using (true) with check (true);
+create policy "public delete planner" on public.planner for delete using (true);
+
+-- 3) Public image bucket --------------------------------------------------------
 insert into storage.buckets (id, name, public)
 values ('recipe-images', 'recipe-images', true)
 on conflict (id) do nothing;

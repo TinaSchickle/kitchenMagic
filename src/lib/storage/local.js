@@ -3,6 +3,7 @@
 // fully usable on this device with zero setup.
 
 const KEY = 'kitchenmagic.recipes.v1'
+const PLANNER_KEY = 'kitchenmagic.planner.v1'
 
 function readAll() {
   try {
@@ -39,6 +40,63 @@ export async function saveRecipe(recipe) {
 
 export async function deleteRecipe(id) {
   writeAll(readAll().filter((r) => r.id !== id))
+}
+
+// --- Planner: recipes the user plans to cook soon -----------------------------
+// Each entry: { recipeId, portions, addedAt }
+
+function readPlanner() {
+  try {
+    const raw = localStorage.getItem(PLANNER_KEY)
+    return raw ? JSON.parse(raw) : []
+  } catch {
+    return []
+  }
+}
+
+function writePlanner(list) {
+  localStorage.setItem(PLANNER_KEY, JSON.stringify(list))
+}
+
+function clampPortions(p) {
+  return Math.max(1, Math.floor(Number(p) || 1))
+}
+
+export async function listPlanner() {
+  return readPlanner().sort((a, b) =>
+    (a.addedAt || '').localeCompare(b.addedAt || ''),
+  )
+}
+
+export async function addToPlanner(recipeId, portions = 1) {
+  const list = readPlanner()
+  const idx = list.findIndex((e) => e.recipeId === recipeId)
+  const entry = {
+    recipeId,
+    portions: clampPortions(portions),
+    addedAt: idx >= 0 ? list[idx].addedAt : new Date().toISOString(),
+  }
+  if (idx >= 0) list[idx] = entry
+  else list.push(entry)
+  writePlanner(list)
+  return entry
+}
+
+export async function setPlannerPortions(recipeId, portions) {
+  const list = readPlanner()
+  const idx = list.findIndex((e) => e.recipeId === recipeId)
+  if (idx >= 0) {
+    list[idx] = { ...list[idx], portions: clampPortions(portions) }
+    writePlanner(list)
+  }
+}
+
+export async function removeFromPlanner(recipeId) {
+  writePlanner(readPlanner().filter((e) => e.recipeId !== recipeId))
+}
+
+export async function clearPlanner() {
+  writePlanner([])
 }
 
 // Store the image inline as a data-URL string.

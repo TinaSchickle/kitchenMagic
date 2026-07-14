@@ -77,6 +77,68 @@ export async function deleteRecipe(id) {
   if (error) throw error
 }
 
+// --- Planner ------------------------------------------------------------------
+// Table `planner`: recipe_id (uuid, pk) | portions (int) | added_at (timestamptz)
+
+function clampPortions(p) {
+  return Math.max(1, Math.floor(Number(p) || 1))
+}
+
+export async function listPlanner() {
+  const { data, error } = await supabase
+    .from('planner')
+    .select('*')
+    .order('added_at', { ascending: true })
+  if (error) throw error
+  return (data || []).map((r) => ({
+    recipeId: r.recipe_id,
+    portions: r.portions || 1,
+    addedAt: r.added_at,
+  }))
+}
+
+export async function addToPlanner(recipeId, portions = 1) {
+  const { data, error } = await supabase
+    .from('planner')
+    .upsert(
+      { recipe_id: recipeId, portions: clampPortions(portions) },
+      { onConflict: 'recipe_id' },
+    )
+    .select()
+    .single()
+  if (error) throw error
+  return {
+    recipeId: data.recipe_id,
+    portions: data.portions,
+    addedAt: data.added_at,
+  }
+}
+
+export async function setPlannerPortions(recipeId, portions) {
+  const { error } = await supabase
+    .from('planner')
+    .update({ portions: clampPortions(portions) })
+    .eq('recipe_id', recipeId)
+  if (error) throw error
+}
+
+export async function removeFromPlanner(recipeId) {
+  const { error } = await supabase
+    .from('planner')
+    .delete()
+    .eq('recipe_id', recipeId)
+  if (error) throw error
+}
+
+export async function clearPlanner() {
+  // Delete every row (guard clause required by Supabase on bulk delete).
+  const { error } = await supabase
+    .from('planner')
+    .delete()
+    .not('recipe_id', 'is', null)
+  if (error) throw error
+}
+
 export async function uploadImage(file) {
   const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase()
   const path = `${uid()}.${ext}`

@@ -5,10 +5,17 @@ import { GalleryCard, ListRow } from './RecipeCard'
 import IngredientFilter from './IngredientFilter'
 import { GridIcon, ListIcon, PlusIcon } from './icons'
 
-export default function Overview({ recipes, loading, onOpen, onAdd }) {
+export default function Overview({
+  recipes,
+  loading,
+  plannedIds,
+  onOpen,
+  onAdd,
+  onTogglePlan,
+}) {
   const [category, setCategory] = useState('all')
   const [mode, setMode] = useState('gallery') // 'gallery' | 'list'
-  const [tokens, setTokens] = useState([])
+  const [selected, setSelected] = useState([]) // ingredient keys (lowercased)
 
   const counts = useMemo(() => {
     const c = { all: recipes.length }
@@ -17,23 +24,38 @@ export default function Overview({ recipes, loading, onOpen, onAdd }) {
     return c
   }, [recipes])
 
+  // Every distinct ingredient across all recipes → checkbox options.
+  const allIngredients = useMemo(() => {
+    const map = new Map() // key -> display label (first seen)
+    for (const r of recipes) {
+      for (const name of recipeIngredientNames(r)) {
+        if (!map.has(name)) map.set(name, name)
+      }
+    }
+    return Array.from(map.keys())
+      .sort((a, b) => a.localeCompare(b))
+      .map((key) => ({ key, label: key }))
+  }, [recipes])
+
   const filtered = useMemo(() => {
     return recipes.filter((r) => {
       if (category !== 'all' && r.category !== category) return false
-      if (tokens.length) {
-        const names = recipeIngredientNames(r)
-        // AND matching: every token must appear in some ingredient name.
-        return tokens.every((t) => names.some((n) => n.includes(t)))
+      if (selected.length) {
+        const names = new Set(recipeIngredientNames(r))
+        // AND matching: recipe must contain every checked ingredient.
+        return selected.every((key) => names.has(key))
       }
       return true
     })
-  }, [recipes, category, tokens])
+  }, [recipes, category, selected])
 
-  const addToken = (t) => setTokens((prev) => [...prev, t])
-  const removeToken = (t) => setTokens((prev) => prev.filter((x) => x !== t))
+  const toggleIngredient = (key) =>
+    setSelected((prev) =>
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key],
+    )
 
   return (
-    <div className="pt-6">
+    <div className="mt-5">
       <div className="mb-5">
         <h1 className="font-display text-3xl sm:text-4xl font-semibold text-cocoa-800">
           Your recipes
@@ -87,10 +109,10 @@ export default function Overview({ recipes, loading, onOpen, onAdd }) {
       {/* Ingredient filter */}
       <div className="mb-6">
         <IngredientFilter
-          tokens={tokens}
-          onAdd={addToken}
-          onRemove={removeToken}
-          onClear={() => setTokens([])}
+          allIngredients={allIngredients}
+          selected={selected}
+          onToggle={toggleIngredient}
+          onClear={() => setSelected([])}
         />
       </div>
 
@@ -100,19 +122,31 @@ export default function Overview({ recipes, loading, onOpen, onAdd }) {
       ) : filtered.length === 0 ? (
         <EmptyState
           hasRecipes={recipes.length > 0}
-          tokens={tokens}
+          selected={selected}
           onAdd={onAdd}
         />
       ) : mode === 'gallery' ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
           {filtered.map((r) => (
-            <GalleryCard key={r.id} recipe={r} onOpen={onOpen} />
+            <GalleryCard
+              key={r.id}
+              recipe={r}
+              onOpen={onOpen}
+              planned={plannedIds.has(r.id)}
+              onTogglePlan={onTogglePlan}
+            />
           ))}
         </div>
       ) : (
         <div className="flex flex-col gap-2.5">
           {filtered.map((r) => (
-            <ListRow key={r.id} recipe={r} onOpen={onOpen} />
+            <ListRow
+              key={r.id}
+              recipe={r}
+              onOpen={onOpen}
+              planned={plannedIds.has(r.id)}
+              onTogglePlan={onTogglePlan}
+            />
           ))}
         </div>
       )}
@@ -180,15 +214,15 @@ function Loading({ mode }) {
   )
 }
 
-function EmptyState({ hasRecipes, tokens, onAdd }) {
+function EmptyState({ hasRecipes, selected, onAdd }) {
   if (hasRecipes) {
     return (
       <div className="text-center py-20">
         <p className="text-5xl mb-3">{'\u{1F50D}'}</p>
         <p className="text-cocoa-600 text-lg font-semibold">No matches</p>
         <p className="text-cocoa-400 mt-1">
-          {tokens.length
-            ? `No recipe contains ${tokens.join(' + ')}.`
+          {selected.length
+            ? `No recipe contains ${selected.join(' + ')}.`
             : 'Nothing in this category yet.'}
         </p>
       </div>

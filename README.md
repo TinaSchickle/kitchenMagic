@@ -13,8 +13,12 @@ the right** — with each block labelled A, B, C… so you can write "mix block 
   process right, always paired.
 - **Overview** of all recipes as a **photo gallery** or a **title list**.
 - **Category tabs** — Breakfast · Lunch · Sweet · Party (set per recipe).
-- **Ingredient filter** — find recipes containing *all* the ingredients you type
-  (e.g. `zucchini` + `carrot`).
+- **Ingredient filter** — checkbox list built from every ingredient across your
+  recipes; tick several to find recipes containing *all* of them (e.g. `zucchini`
+  + `carrot`).
+- **Planner** — bookmark recipes you want to cook soon, set portions for each,
+  then **generate a shopping list** with amounts scaled per plan. Tick items off
+  as you shop, or copy the list to your clipboard.
 
 ## Tech
 

@@ -89,3 +89,72 @@ export const CheckIcon = (p) => (
     <path d="M20 6 9 17l-5-5" />
   </svg>
 )
+
+export const BookmarkIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+  </svg>
+)
+
+export const BookmarkCheckIcon = (p) => (
+  <svg {...base} fill="currentColor" stroke="none" {...p}>
+    <path d="M17 3a2 2 0 0 1 2 2v16l-7-5-7 5V5a2 2 0 0 1 2-2z" opacity="0.18" />
+    <path
+      d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+    <path
+      d="M9 10.5l2 2 4-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+)
+
+export const CartIcon = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="9" cy="20" r="1.5" />
+    <circle cx="18" cy="20" r="1.5" />
+    <path d="M2 3h2.2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.2h8.9a1.5 1.5 0 0 0 1.5-1.2L21 7H5" />
+  </svg>
+)
+
+export const ChevronDownIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+)
+
+export const FilterIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M3 5h18M6 12h12M10 19h4" />
+  </svg>
+)
+
+export const ClipboardIcon = (p) => (
+  <svg {...base} {...p}>
+    <rect x="8" y="3" width="8" height="4" rx="1" />
+    <path d="M8 5H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
+  </svg>
+)
+
+export const CalendarIcon = (p) => (
+  <svg {...base} {...p}>
+    <rect x="3" y="4" width="18" height="17" rx="2" />
+    <path d="M3 9h18M8 2v4M16 2v4" />
+  </svg>
+)
+
+export const BookIcon = (p) => (
+  <svg {...base} {...p}>
+    <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
+    <path d="M4 5v14" />
+  </svg>
+)

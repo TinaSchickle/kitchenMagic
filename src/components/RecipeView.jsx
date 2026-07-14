@@ -5,12 +5,21 @@ import { scaleAmount } from '../lib/scale'
 import PortionStepper from './PortionStepper'
 import {
   ArrowLeftIcon,
+  BookmarkCheckIcon,
+  BookmarkIcon,
   PencilIcon,
   TrashIcon,
   XIcon,
 } from './icons'
 
-export default function RecipeView({ recipe, onBack, onEdit, onDelete }) {
+export default function RecipeView({
+  recipe,
+  isPlanned,
+  onTogglePlan,
+  onBack,
+  onEdit,
+  onDelete,
+}) {
   const [portions, setPortions] = useState(1)
   const [confirming, setConfirming] = useState(false)
   const cat = CATEGORY_MAP[recipe.category]
@@ -24,6 +33,23 @@ export default function RecipeView({ recipe, onBack, onEdit, onDelete }) {
           <span className="hidden sm:inline">All recipes</span>
         </button>
         <div className="flex items-center gap-2">
+          <button
+            className={
+              isPlanned
+                ? 'btn bg-sage-500 text-white px-4 py-2 hover:bg-sage-600 shadow-soft'
+                : 'btn-ghost'
+            }
+            onClick={() => onTogglePlan(recipe.id, portions)}
+          >
+            {isPlanned ? (
+              <BookmarkCheckIcon width={18} height={18} />
+            ) : (
+              <BookmarkIcon width={18} height={18} />
+            )}
+            <span className="hidden sm:inline">
+              {isPlanned ? 'In planner' : 'Add to planner'}
+            </span>
+          </button>
           <button className="btn-ghost" onClick={onEdit}>
             <PencilIcon width={18} height={18} />
             <span className="hidden sm:inline">Edit</span>
@@ -31,6 +57,7 @@ export default function RecipeView({ recipe, onBack, onEdit, onDelete }) {
           <button
             className="btn bg-white/70 text-terracotta-600 px-4 py-2 hover:bg-terracotta-50 shadow-soft"
             onClick={() => setConfirming(true)}
+            aria-label="Delete recipe"
           >
             <TrashIcon width={18} height={18} />
           </button>
