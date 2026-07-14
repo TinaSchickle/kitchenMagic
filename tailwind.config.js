@@ -8,33 +8,39 @@ export default {
         sans: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Warm, fresh cookbook palette
+        // Grounding & calming, earthy palette.
+        // Token names kept (terracotta/sage/cream/cocoa) so components need no
+        // changes — only the values are retuned toward muted, natural tones.
         cream: {
-          50: '#FDF9F3',
-          100: '#F7EDE1',
-          200: '#F0E0CC',
+          // warm oat / stone neutrals
+          50: '#F5F2EA',
+          100: '#EAE3D6',
+          200: '#D9D0BE',
         },
         terracotta: {
-          50: '#FBEEE8',
-          100: '#F6D9CC',
-          300: '#EFA588',
-          400: '#E8825C',
-          500: '#E06A3C',
-          600: '#C9552B',
-          700: '#A64220',
+          // muted clay / adobe — the grounding accent
+          50: '#F1EAE4',
+          100: '#E3D2C6',
+          300: '#CBA48E',
+          400: '#B58369',
+          500: '#9E6A50',
+          600: '#82573F',
+          700: '#674531',
         },
         sage: {
-          50: '#EEF4E9',
-          100: '#DBE8CE',
-          300: '#A7C589',
-          400: '#89AF66',
-          500: '#6E964C',
-          600: '#57783B',
+          // soft olive / eucalyptus — the calming secondary
+          50: '#ECF0E8',
+          100: '#D9E1CD',
+          300: '#A7B98E',
+          400: '#889F6C',
+          500: '#6C8552',
+          600: '#54683F',
         },
         cocoa: {
-          400: '#8A7866',
-          600: '#5C4A3A',
-          800: '#3B2E23',
+          // espresso / bark text tones
+          400: '#8A7C6B',
+          600: '#574A3B',
+          800: '#2F271E',
         },
       },
       boxShadow: {
