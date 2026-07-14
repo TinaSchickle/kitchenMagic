@@ -123,14 +123,15 @@ function Block({ block, index, portions }) {
       {/* Big greyed watermark letter */}
       <span
         aria-hidden
-        className="pointer-events-none select-none absolute -top-6 right-2 font-display font-semibold text-cocoa-800/[0.06] leading-none text-[9rem] sm:text-[11rem]"
+        className="pointer-events-none select-none absolute -top-4 right-2 font-display font-semibold text-cocoa-800/[0.06] leading-none text-[6rem] sm:text-[11rem]"
       >
         {letter}
       </span>
 
-      <div className="relative grid sm:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      {/* Always two columns — ingredients left, method right, like a table */}
+      <div className="relative grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
         {/* Left — ingredients */}
-        <div className="p-5 sm:p-6 sm:border-r border-cream-200/70">
+        <div className="p-4 sm:p-6 border-r border-cream-200/70">
           <div className="flex items-center gap-2 mb-3">
             <span className="grid place-items-center w-7 h-7 rounded-full bg-terracotta-500 text-white text-sm font-bold shadow-soft">
               {letter}
@@ -156,7 +157,7 @@ function Block({ block, index, portions }) {
         </div>
 
         {/* Right — process */}
-        <div className="p-5 sm:p-6">
+        <div className="p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-3">
             <span className="text-xs uppercase tracking-wider font-bold text-cocoa-400">
               Method
