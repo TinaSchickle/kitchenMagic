@@ -17,13 +17,15 @@ create table if not exists public.recipes (
   category    text not null default 'lunch',
   image_url   text,
   serves      integer,
+  makes       integer,
   blocks      jsonb not null default '[]'::jsonb,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
 );
 
--- Adds the column for projects created before `serves` existed (safe to re-run).
+-- Adds columns for projects created before they existed (safe to re-run).
 alter table public.recipes add column if not exists serves integer;
+alter table public.recipes add column if not exists makes integer;
 
 create index if not exists recipes_created_at_idx
   on public.recipes (created_at desc);

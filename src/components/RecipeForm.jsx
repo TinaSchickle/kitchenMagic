@@ -183,9 +183,9 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         </div>
 
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
-          Feeds
+          Yield
         </label>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
           <input
             type="number"
             min={1}
@@ -200,13 +200,33 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
               })
             }
             placeholder="4"
-            className="field w-24 text-center"
+            className="field w-20 text-center"
             aria-label="Number of people this recipe feeds"
           />
-          <span className="text-cocoa-600">people (at 1 portion)</span>
+          <span className="text-cocoa-600">feeds people</span>
+          <span className="text-cocoa-400 px-1">/</span>
+          <input
+            type="number"
+            min={1}
+            inputMode="numeric"
+            value={recipe.makes ?? ''}
+            onChange={(e) =>
+              patch({
+                makes:
+                  e.target.value === ''
+                    ? null
+                    : Math.max(1, Math.floor(Number(e.target.value) || 1)),
+              })
+            }
+            placeholder="12"
+            className="field w-20 text-center"
+            aria-label="Number of pieces this recipe makes"
+          />
+          <span className="text-cocoa-600">makes pieces</span>
         </div>
         <p className="text-xs text-cocoa-400 mt-1">
-          Scales with the portion multiplier — leave blank to hide it.
+          At 1 portion. Both scale with the portion multiplier — leave a field
+          blank to hide it.
         </p>
 
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">

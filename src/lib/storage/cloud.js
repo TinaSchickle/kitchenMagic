@@ -26,6 +26,7 @@ function rowToRecipe(row) {
     category: row.category || 'lunch',
     image: row.image_url || null,
     serves: row.serves ?? null,
+    makes: row.makes ?? null,
     blocks: row.blocks || [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -39,6 +40,7 @@ function recipeToRow(recipe) {
     category: recipe.category,
     image_url: recipe.image || null,
     serves: recipe.serves ?? null,
+    makes: recipe.makes ?? null,
     blocks: recipe.blocks || [],
     updated_at: new Date().toISOString(),
   }
@@ -63,25 +65,30 @@ export async function getRecipe(id) {
   return data ? rowToRecipe(data) : null
 }
 
+// Optional columns that may not exist yet in an older database.
+const OPTIONAL_COLUMNS = ['serves', 'makes']
+
 export async function saveRecipe(recipe) {
-  const row = recipeToRow(recipe)
-  let res = await supabase
-    .from('recipes')
-    .upsert(row, { onConflict: 'id' })
-    .select()
-    .single()
-  // Graceful fallback if the `serves` column hasn't been added to the DB yet:
-  // retry without it so saving still works (serves just won't persist).
-  if (res.error && /serves/i.test(res.error.message || '')) {
-    const { serves, ...rest } = row
-    res = await supabase
+  let attempt = recipeToRow(recipe)
+  // Retry a couple of times, dropping only the specific optional column the DB
+  // reports as missing — so e.g. a missing `makes` never costs us `serves`.
+  for (let i = 0; i < OPTIONAL_COLUMNS.length + 1; i++) {
+    const res = await supabase
       .from('recipes')
-      .upsert(rest, { onConflict: 'id' })
+      .upsert(attempt, { onConflict: 'id' })
       .select()
       .single()
+    if (!res.error) return rowToRecipe(res.data)
+
+    const missing = (res.error.message || '').match(/'([a-z_]+)' column/i)?.[1]
+    if (missing && OPTIONAL_COLUMNS.includes(missing) && missing in attempt) {
+      const { [missing]: _drop, ...rest } = attempt
+      attempt = rest
+      continue
+    }
+    throw res.error
   }
-  if (res.error) throw res.error
-  return rowToRecipe(res.data)
+  throw new Error('Could not save recipe')
 }
 
 export async function deleteRecipe(id) {

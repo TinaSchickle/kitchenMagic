@@ -17,8 +17,9 @@ export function newRecipe() {
     title: '',
     category: 'lunch',
     image: null,
-    // How many people the recipe feeds at the base (×1) portion. Optional.
-    serves: 4,
+    // Yield at the base (×1) portion — both optional, both scale with portions.
+    serves: 4, // "feeds N people"
+    makes: null, // "makes N pieces"
     blocks: [newBlock()],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),

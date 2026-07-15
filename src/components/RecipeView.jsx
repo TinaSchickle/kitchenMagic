@@ -97,6 +97,13 @@ export default function RecipeView({
                 {recipe.serves * portions === 1 ? 'person' : 'people'}
               </p>
             ) : null}
+            {recipe.makes ? (
+              <p className="text-sm text-cocoa-600 mt-1 sm:text-right">
+                <span aria-hidden>{'\u{1F9C1}'} </span>
+                Makes {recipe.makes * portions}{' '}
+                {recipe.makes * portions === 1 ? 'piece' : 'pieces'}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>
