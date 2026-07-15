@@ -18,6 +18,7 @@ create table if not exists public.recipes (
   image_url   text,
   serves      integer,
   makes       integer,
+  foodprep    boolean not null default false,
   blocks      jsonb not null default '[]'::jsonb,
   created_at  timestamptz not null default now(),
   updated_at  timestamptz not null default now()
@@ -26,6 +27,7 @@ create table if not exists public.recipes (
 -- Adds columns for projects created before they existed (safe to re-run).
 alter table public.recipes add column if not exists serves integer;
 alter table public.recipes add column if not exists makes integer;
+alter table public.recipes add column if not exists foodprep boolean not null default false;
 
 create index if not exists recipes_created_at_idx
   on public.recipes (created_at desc);

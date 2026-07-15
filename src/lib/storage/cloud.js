@@ -27,6 +27,7 @@ function rowToRecipe(row) {
     image: row.image_url || null,
     serves: row.serves ?? null,
     makes: row.makes ?? null,
+    foodprep: row.foodprep ?? false,
     blocks: row.blocks || [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -41,6 +42,7 @@ function recipeToRow(recipe) {
     image_url: recipe.image || null,
     serves: recipe.serves ?? null,
     makes: recipe.makes ?? null,
+    foodprep: recipe.foodprep ?? false,
     blocks: recipe.blocks || [],
     updated_at: new Date().toISOString(),
   }
@@ -66,7 +68,7 @@ export async function getRecipe(id) {
 }
 
 // Optional columns that may not exist yet in an older database.
-const OPTIONAL_COLUMNS = ['serves', 'makes']
+const OPTIONAL_COLUMNS = ['serves', 'makes', 'foodprep']
 
 export async function saveRecipe(recipe) {
   let attempt = recipeToRow(recipe)

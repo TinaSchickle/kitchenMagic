@@ -229,6 +229,27 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
           blank to hide it.
         </p>
 
+        <label className="flex items-center gap-3 mt-5 cursor-pointer select-none w-fit">
+          <span
+            className={`grid place-items-center w-6 h-6 rounded-lg border-2 flex-shrink-0 transition ${
+              recipe.foodprep
+                ? 'bg-sage-500 border-sage-500 text-white'
+                : 'border-cream-200 bg-white'
+            }`}
+          >
+            {recipe.foodprep && <CheckIcon width={15} height={15} />}
+          </span>
+          <span className="text-sm font-bold text-cocoa-600">
+            {'\u{1F961}'} Perfect for food prep
+          </span>
+          <input
+            type="checkbox"
+            className="sr-only"
+            checked={recipe.foodprep}
+            onChange={(e) => patch({ foodprep: e.target.checked })}
+          />
+        </label>
+
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
           Photo
         </label>

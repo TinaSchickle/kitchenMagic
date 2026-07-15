@@ -3,7 +3,7 @@ import { CATEGORIES } from '../lib/categories'
 import { recipeIngredientNames } from '../lib/model'
 import { GalleryCard, ListRow } from './RecipeCard'
 import IngredientFilter from './IngredientFilter'
-import { GridIcon, ListIcon, PlusIcon } from './icons'
+import { CheckIcon, GridIcon, ListIcon, PlusIcon } from './icons'
 
 export default function Overview({
   recipes,
@@ -16,6 +16,7 @@ export default function Overview({
   const [category, setCategory] = useState('all')
   const [mode, setMode] = useState('gallery') // 'gallery' | 'list'
   const [selected, setSelected] = useState([]) // ingredient keys (lowercased)
+  const [foodprepOnly, setFoodprepOnly] = useState(false)
 
   const counts = useMemo(() => {
     const c = { all: recipes.length }
@@ -40,6 +41,7 @@ export default function Overview({
   const filtered = useMemo(() => {
     return recipes.filter((r) => {
       if (category !== 'all' && r.category !== category) return false
+      if (foodprepOnly && !r.foodprep) return false
       if (selected.length) {
         const names = new Set(recipeIngredientNames(r))
         // AND matching: recipe must contain every checked ingredient.
@@ -47,7 +49,12 @@ export default function Overview({
       }
       return true
     })
-  }, [recipes, category, selected])
+  }, [recipes, category, selected, foodprepOnly])
+
+  const foodprepCount = useMemo(
+    () => recipes.filter((r) => r.foodprep).length,
+    [recipes],
+  )
 
   const toggleIngredient = (key) =>
     setSelected((prev) =>
@@ -104,6 +111,37 @@ export default function Overview({
             <ListIcon width={18} height={18} />
           </ToggleBtn>
         </div>
+      </div>
+
+      {/* Food-prep toggle */}
+      <div className="mb-3">
+        <button
+          onClick={() => setFoodprepOnly((v) => !v)}
+          aria-pressed={foodprepOnly}
+          className={`inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold transition-all ${
+            foodprepOnly
+              ? 'bg-terracotta-500 text-white shadow-soft'
+              : 'bg-white/70 text-cocoa-600 hover:bg-white'
+          }`}
+        >
+          <span
+            className={`grid place-items-center w-5 h-5 rounded-md border-2 flex-shrink-0 ${
+              foodprepOnly
+                ? 'bg-white/25 border-white/60 text-white'
+                : 'border-cream-200 bg-white'
+            }`}
+          >
+            {foodprepOnly && <CheckIcon width={13} height={13} />}
+          </span>
+          {'\u{1F961}'} Perfect for food prep
+          <span
+            className={`text-xs rounded-full px-1.5 py-0.5 ${
+              foodprepOnly ? 'bg-white/25' : 'bg-cream-200 text-cocoa-400'
+            }`}
+          >
+            {foodprepCount}
+          </span>
+        </button>
       </div>
 
       {/* Ingredient filter */}

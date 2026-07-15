@@ -69,9 +69,16 @@ export function GalleryCard({ recipe, onOpen, planned, onTogglePlan }) {
           <h3 className="font-display text-lg font-semibold text-cocoa-800 leading-snug line-clamp-2">
             {recipe.title || 'Untitled recipe'}
           </h3>
-          <p className="text-sm text-cocoa-400 mt-1">
-            {count} {count === 1 ? 'ingredient' : 'ingredients'}
-          </p>
+          <div className="flex items-center gap-2 mt-1">
+            <p className="text-sm text-cocoa-400">
+              {count} {count === 1 ? 'ingredient' : 'ingredients'}
+            </p>
+            {recipe.foodprep && (
+              <span className="chip bg-terracotta-100 text-terracotta-700 text-xs py-0.5">
+                {'\u{1F961}'} prep
+              </span>
+            )}
+          </div>
         </div>
       </button>
       <PlanButton
@@ -109,6 +116,9 @@ export function ListRow({ recipe, onOpen, planned, onTogglePlan }) {
           </h3>
           <p className="text-sm text-cocoa-400">
             {cat ? `${cat.emoji} ${cat.label}` : ''}
+            {recipe.foodprep && (
+              <span className="text-terracotta-600"> · {'\u{1F961}'} food prep</span>
+            )}
           </p>
         </div>
       </button>

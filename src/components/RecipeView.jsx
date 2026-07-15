@@ -77,12 +77,19 @@ export default function RecipeView({
         )}
         <div className="p-5 sm:p-7 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
           <div>
-            {cat && (
-              <span className="chip bg-sage-100 text-sage-600 mb-3">
-                <span>{cat.emoji}</span>
-                {cat.label}
-              </span>
-            )}
+            <div className="flex flex-wrap items-center gap-2 mb-3">
+              {cat && (
+                <span className="chip bg-sage-100 text-sage-600">
+                  <span>{cat.emoji}</span>
+                  {cat.label}
+                </span>
+              )}
+              {recipe.foodprep && (
+                <span className="chip bg-terracotta-100 text-terracotta-700">
+                  {'\u{1F961}'} Food-prep friendly
+                </span>
+              )}
+            </div>
             <h1 className="font-display text-3xl sm:text-4xl font-semibold text-cocoa-800 leading-tight">
               {recipe.title || 'Untitled recipe'}
             </h1>

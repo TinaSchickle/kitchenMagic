@@ -20,6 +20,7 @@ export function newRecipe() {
     // Yield at the base (×1) portion — both optional, both scale with portions.
     serves: 4, // "feeds N people"
     makes: null, // "makes N pieces"
+    foodprep: false, // "perfect for food prep"
     blocks: [newBlock()],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
