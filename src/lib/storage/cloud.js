@@ -25,6 +25,7 @@ function rowToRecipe(row) {
     title: row.title || '',
     category: row.category || 'lunch',
     image: row.image_url || null,
+    serves: row.serves ?? null,
     blocks: row.blocks || [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
@@ -37,6 +38,7 @@ function recipeToRow(recipe) {
     title: recipe.title,
     category: recipe.category,
     image_url: recipe.image || null,
+    serves: recipe.serves ?? null,
     blocks: recipe.blocks || [],
     updated_at: new Date().toISOString(),
   }
@@ -63,13 +65,23 @@ export async function getRecipe(id) {
 
 export async function saveRecipe(recipe) {
   const row = recipeToRow(recipe)
-  const { data, error } = await supabase
+  let res = await supabase
     .from('recipes')
     .upsert(row, { onConflict: 'id' })
     .select()
     .single()
-  if (error) throw error
-  return rowToRecipe(data)
+  // Graceful fallback if the `serves` column hasn't been added to the DB yet:
+  // retry without it so saving still works (serves just won't persist).
+  if (res.error && /serves/i.test(res.error.message || '')) {
+    const { serves, ...rest } = row
+    res = await supabase
+      .from('recipes')
+      .upsert(rest, { onConflict: 'id' })
+      .select()
+      .single()
+  }
+  if (res.error) throw res.error
+  return rowToRecipe(res.data)
 }
 
 export async function deleteRecipe(id) {

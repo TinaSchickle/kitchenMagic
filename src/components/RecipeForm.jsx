@@ -183,6 +183,33 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         </div>
 
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
+          Feeds
+        </label>
+        <div className="flex items-center gap-2">
+          <input
+            type="number"
+            min={1}
+            inputMode="numeric"
+            value={recipe.serves ?? ''}
+            onChange={(e) =>
+              patch({
+                serves:
+                  e.target.value === ''
+                    ? null
+                    : Math.max(1, Math.floor(Number(e.target.value) || 1)),
+              })
+            }
+            placeholder="4"
+            className="field w-24 text-center"
+            aria-label="Number of people this recipe feeds"
+          />
+          <span className="text-cocoa-600">people (at 1 portion)</span>
+        </div>
+        <p className="text-xs text-cocoa-400 mt-1">
+          Scales with the portion multiplier — leave blank to hide it.
+        </p>
+
+        <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
           Photo
         </label>
         <ImagePicker

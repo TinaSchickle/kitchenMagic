@@ -90,6 +90,13 @@ export default function RecipeView({
           <div className="flex-shrink-0">
             <p className="text-sm text-cocoa-400 mb-1 sm:text-right">Portions</p>
             <PortionStepper value={portions} onChange={setPortions} />
+            {recipe.serves ? (
+              <p className="text-sm text-cocoa-600 mt-2 sm:text-right">
+                <span aria-hidden>{'\u{1F37D}️'} </span>
+                Feeds {recipe.serves * portions}{' '}
+                {recipe.serves * portions === 1 ? 'person' : 'people'}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

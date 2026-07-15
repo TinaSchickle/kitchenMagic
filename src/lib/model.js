@@ -17,6 +17,8 @@ export function newRecipe() {
     title: '',
     category: 'lunch',
     image: null,
+    // How many people the recipe feeds at the base (×1) portion. Optional.
+    serves: 4,
     blocks: [newBlock()],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
