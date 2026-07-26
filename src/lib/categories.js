@@ -4,6 +4,7 @@ export const CATEGORIES = [
   { id: 'lunch', label: 'Lunch', emoji: '\u{1F957}' }, // 🥗
   { id: 'sweet', label: 'Sweet', emoji: '\u{1F370}' }, // 🍰
   { id: 'party', label: 'Party', emoji: '\u{1F389}' }, // 🎉
+  { id: 'thyroid', label: 'Schilddrüse', emoji: '\u{1F98B}' }, // 🦋
 ]
 
 export const CATEGORY_MAP = Object.fromEntries(
