@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import * as storage from './lib/storage'
 import Header from './components/Header'
-import PrimaryNav from './components/PrimaryNav'
 import Overview from './components/Overview'
 import Planner from './components/Planner'
 import ShoppingList from './components/ShoppingList'
@@ -110,6 +109,9 @@ export default function App() {
         onLogoClick={openOverview}
         onAdd={openNew}
         showAdd={view.name === 'overview'}
+        view={view.name}
+        plannerCount={planner.length}
+        onNavigate={(v) => setView({ name: v })}
       />
 
       <main className="flex-1 w-full max-w-6xl mx-auto px-4 sm:px-6 pb-24">
@@ -117,14 +119,6 @@ export default function App() {
           <div className="mt-6 rounded-2xl bg-terracotta-50 text-terracotta-700 border border-terracotta-100 px-4 py-3">
             {error}
           </div>
-        )}
-
-        {(view.name === 'overview' || view.name === 'planner') && (
-          <PrimaryNav
-            current={view.name}
-            plannerCount={planner.length}
-            onNavigate={(v) => setView({ name: v })}
-          />
         )}
 
         {view.name === 'overview' && (

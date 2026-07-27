@@ -72,25 +72,37 @@ export default function Overview({
     )
 
   return (
-    <div className="mt-5">
-      <div className="mb-5">
-        <h1 className="font-display text-3xl sm:text-4xl font-semibold text-cocoa-800">
-          Your recipes
-        </h1>
-        <p className="text-cocoa-400 mt-1">
-          {recipes.length} saved · pick a tab or filter by ingredient
-        </p>
+    <div className="mt-4">
+      {/* Category tabs — all visible (wrapping), even on mobile */}
+      <div className="flex flex-wrap gap-2 mb-3">
+        <Tab
+          label="All"
+          active={category === 'all'}
+          count={counts.all}
+          onClick={() => setCategory('all')}
+          allTab
+        />
+        {CATEGORIES.map((cat) => (
+          <Tab
+            key={cat.id}
+            label={cat.label}
+            emoji={cat.emoji}
+            active={category === cat.id}
+            count={counts[cat.id]}
+            onClick={() => setCategory(cat.id)}
+          />
+        ))}
       </div>
 
-      {/* Title search */}
-      <div className="mb-4">
-        <div className="card flex items-center gap-2 px-4 py-2.5">
+      {/* Title search (between categories and food-prep) + view toggle */}
+      <div className="flex items-center gap-2 mb-3">
+        <div className="card flex-1 flex items-center gap-2 px-4 py-2.5">
           <SearchIcon width={18} height={18} className="text-cocoa-400 flex-shrink-0" />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Rezept suchen…"
-            className="flex-1 bg-transparent text-cocoa-800 placeholder-cocoa-400/70 focus:outline-none"
+            className="flex-1 min-w-0 bg-transparent text-cocoa-800 placeholder-cocoa-400/70 focus:outline-none"
             aria-label="Rezept nach Titel suchen"
           />
           {query && (
@@ -102,30 +114,6 @@ export default function Overview({
               <XIcon width={18} height={18} />
             </button>
           )}
-        </div>
-      </div>
-
-      {/* Category tabs + view toggle */}
-      <div className="flex items-center gap-3 mb-4">
-        <div className="flex-1 flex gap-2 overflow-x-auto pb-1 -mb-1">
-          <Tab
-            label="All"
-            emoji="\u{1F373}"
-            active={category === 'all'}
-            count={counts.all}
-            onClick={() => setCategory('all')}
-            allTab
-          />
-          {CATEGORIES.map((cat) => (
-            <Tab
-              key={cat.id}
-              label={cat.label}
-              emoji={cat.emoji}
-              active={category === cat.id}
-              count={counts[cat.id]}
-              onClick={() => setCategory(cat.id)}
-            />
-          ))}
         </div>
 
         <div className="flex-shrink-0 flex items-center gap-1 bg-white/70 rounded-full p-1 shadow-soft">
@@ -230,7 +218,7 @@ function Tab({ label, emoji, active, count, onClick, allTab }) {
   return (
     <button
       onClick={onClick}
-      className={`flex-shrink-0 inline-flex items-center gap-2 rounded-full px-4 py-2 font-semibold transition-all ${
+      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${
         active
           ? 'bg-terracotta-500 text-white shadow-soft'
           : 'bg-white/70 text-cocoa-600 hover:bg-white'
@@ -239,7 +227,7 @@ function Tab({ label, emoji, active, count, onClick, allTab }) {
       {!allTab && <span>{emoji}</span>}
       {label}
       <span
-        className={`text-xs rounded-full px-1.5 py-0.5 ${
+        className={`text-xs rounded-full px-1.5 ${
           active ? 'bg-white/25' : 'bg-cream-200 text-cocoa-400'
         }`}
       >
