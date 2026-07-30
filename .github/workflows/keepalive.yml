@@ -1,0 +1,43 @@
+name: Supabase wachhalten
+
+# Der kostenlose Supabase-Tarif pausiert ein Projekt nach 7 Tagen ohne
+# Aktivität. Dieser Job tippt die Datenbank alle 3 Tage einmal an, damit sie
+# nie einschläft. Dieses Supabase-Projekt (wscuovmzdbhwugxsgfjw) wird nicht
+# nur von kitchenMagic genutzt, sondern auch von Mood und Edersee Kasse –
+# ein Ping von hier hält es für alle drei wach. Läuft auf GitHubs Servern,
+# völlig unabhängig von deinen Geräten.
+
+on:
+  schedule:
+    - cron: '32 7 */3 * *' # alle 3 Tage um 07:32 UTC
+  workflow_dispatch: # erlaubt manuelles Auslösen zum Testen
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Datenbank antippen
+        env:
+          SUPABASE_URL: https://wscuovmzdbhwugxsgfjw.supabase.co
+          SUPABASE_ANON_KEY: sb_publishable_eAz7id9uPfkRq0wTll_UFA_HaR9JMj1
+        run: |
+          # Eine leichte REST-Anfrage genügt als Aktivität. Dieses Projekt hat
+          # kein RLS (öffentlicher Datensatz), daher liefert ein gültiger Ping
+          # normalerweise 200 mit Daten.
+          # --fail-with-body würde bei 4xx/5xx selbst fehlschlagen; wir werten
+          # den Code aber manuell aus.
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
+            "$SUPABASE_URL/rest/v1/recipes?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY") || code="curl-error"
+          echo "HTTP $code"
+          # "000" oder ein nicht-numerischer Wert heißt: curl kam gar nicht erst
+          # durch (DNS/Timeout/Verbindung verweigert) – genau das Symptom eines
+          # pausierten Projekts. Das darf NICHT als Erfolg durchgehen.
+          if ! [ "$code" -eq "$code" ] 2>/dev/null || [ "$code" = "000" ]; then
+            echo "Keine Verbindung zustande gekommen – Projekt evtl. pausiert oder DNS/Netzwerkfehler."
+            exit 1
+          fi
+          if [ "$code" -ge 500 ]; then
+            echo "Server-Fehler – Projekt evtl. pausiert."
+            exit 1
+          fi
