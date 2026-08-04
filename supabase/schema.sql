@@ -48,9 +48,12 @@ create policy "public delete recipes" on public.recipes for delete using (true);
 -- 2) Planner table (recipes to cook soon) ---------------------------------------
 create table if not exists public.planner (
   recipe_id  uuid primary key references public.recipes (id) on delete cascade,
-  portions   integer not null default 1,
+  portions   numeric not null default 1, -- supports 0.5 steps (1, 1.5, 2, ...)
   added_at   timestamptz not null default now()
 );
+
+-- Widens the column for projects created before 0.5 steps existed (safe to re-run).
+alter table public.planner alter column portions type numeric using portions::numeric;
 
 alter table public.planner enable row level security;
 

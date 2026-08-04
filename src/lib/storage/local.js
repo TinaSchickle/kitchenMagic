@@ -59,7 +59,8 @@ function writePlanner(list) {
 }
 
 function clampPortions(p) {
-  return Math.max(1, Math.floor(Number(p) || 1))
+  // Allow 0.5 steps, minimum 1.
+  return Math.max(1, Math.round((Number(p) || 1) * 2) / 2)
 }
 
 export async function listPlanner() {

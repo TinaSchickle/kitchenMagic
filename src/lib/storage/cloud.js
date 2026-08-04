@@ -99,10 +99,11 @@ export async function deleteRecipe(id) {
 }
 
 // --- Planner ------------------------------------------------------------------
-// Table `planner`: recipe_id (uuid, pk) | portions (int) | added_at (timestamptz)
+// Table `planner`: recipe_id (uuid, pk) | portions (numeric) | added_at (timestamptz)
 
 function clampPortions(p) {
-  return Math.max(1, Math.floor(Number(p) || 1))
+  // Allow 0.5 steps, minimum 1.
+  return Math.max(1, Math.round((Number(p) || 1) * 2) / 2)
 }
 
 export async function listPlanner() {

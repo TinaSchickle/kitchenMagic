@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { CATEGORY_MAP } from '../lib/categories'
 import { blockLetter } from '../lib/model'
 import { scaleAmount } from '../lib/scale'
-import PortionStepper from './PortionStepper'
+import PortionStepper, { formatPortions } from './PortionStepper'
 import {
   ArrowLeftIcon,
   BookmarkCheckIcon,
@@ -100,14 +100,14 @@ export default function RecipeView({
             {recipe.serves ? (
               <p className="text-sm text-cocoa-600 mt-2 sm:text-right">
                 <span aria-hidden>{'\u{1F37D}️'} </span>
-                Feeds {recipe.serves * portions}{' '}
+                Feeds {formatPortions(recipe.serves * portions)}{' '}
                 {recipe.serves * portions === 1 ? 'person' : 'people'}
               </p>
             ) : null}
             {recipe.makes ? (
               <p className="text-sm text-cocoa-600 mt-1 sm:text-right">
                 <span aria-hidden>{'\u{1F9C1}'} </span>
-                Makes {recipe.makes * portions}{' '}
+                Makes {formatPortions(recipe.makes * portions)}{' '}
                 {recipe.makes * portions === 1 ? 'piece' : 'pieces'}
               </p>
             ) : null}
