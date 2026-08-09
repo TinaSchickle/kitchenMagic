@@ -6,6 +6,9 @@ export const CATEGORIES = [
   { id: 'party', label: 'Party', emoji: '\u{1F389}' }, // 🎉
   { id: 'thyroid', label: 'Schilddrüse', emoji: '\u{1F98B}' }, // 🦋
   { id: 'try', label: 'Try', emoji: '\u{1F9EA}' }, // 🧪 — untested / not yet made
+  // hiddenFromAll: not food, so it's excluded from the "All" tab — only
+  // visible when the DIY tab itself is selected.
+  { id: 'diy', label: 'DIY', emoji: '\u{1F9F9}', hiddenFromAll: true }, // 🧹
 ]
 
 export const CATEGORY_MAP = Object.fromEntries(

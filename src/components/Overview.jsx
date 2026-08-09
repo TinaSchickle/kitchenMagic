@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CATEGORIES } from '../lib/categories'
+import { CATEGORIES, CATEGORY_MAP } from '../lib/categories'
 import { recipeIngredientNames } from '../lib/model'
 import { GalleryCard, ListRow } from './RecipeCard'
 import IngredientFilter from './IngredientFilter'
@@ -20,9 +20,12 @@ export default function Overview({
   const [query, setQuery] = useState('') // title search
 
   const counts = useMemo(() => {
-    const c = { all: recipes.length }
+    const c = { all: 0 }
     for (const cat of CATEGORIES) c[cat.id] = 0
-    for (const r of recipes) if (c[r.category] != null) c[r.category] += 1
+    for (const r of recipes) {
+      if (c[r.category] != null) c[r.category] += 1
+      if (!CATEGORY_MAP[r.category]?.hiddenFromAll) c.all += 1
+    }
     return c
   }, [recipes])
 
@@ -43,7 +46,11 @@ export default function Overview({
     const q = query.trim().toLowerCase()
     return recipes
       .filter((r) => {
-        if (category !== 'all' && r.category !== category) return false
+        if (category === 'all') {
+          if (CATEGORY_MAP[r.category]?.hiddenFromAll) return false
+        } else if (r.category !== category) {
+          return false
+        }
         if (foodprepOnly && !r.foodprep) return false
         if (q && !(r.title || '').toLowerCase().includes(q)) return false
         if (selected.length) {
