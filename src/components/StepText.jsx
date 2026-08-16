@@ -12,7 +12,7 @@ export default function StepText({ text, ingredients, portions, className }) {
           return (
             <span
               key={i}
-              className="font-semibold text-terracotta-600 bg-terracotta-50 rounded px-1"
+              className="font-semibold text-terracotta-700 bg-gradient-to-b from-terracotta-100 to-terracotta-50 ring-1 ring-inset ring-terracotta-300/50 rounded-full px-2 py-0.5 whitespace-nowrap"
             >
               {seg.value}
             </span>
@@ -22,7 +22,7 @@ export default function StepText({ text, ingredients, portions, className }) {
           return (
             <span
               key={i}
-              className="font-semibold text-amber-700 bg-amber-50 rounded px-1"
+              className="font-semibold text-amber-800 bg-gradient-to-b from-amber-100 to-amber-50 ring-1 ring-inset ring-amber-300/50 rounded-full px-2 py-0.5 whitespace-nowrap"
               title="Keine passende Zutat gefunden"
             >
               [{seg.value}]
