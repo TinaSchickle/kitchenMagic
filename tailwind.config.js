@@ -8,45 +8,45 @@ export default {
         sans: ['Nunito', 'ui-sans-serif', 'system-ui', 'sans-serif'],
       },
       colors: {
-        // Grounding & calming, earthy palette.
+        // Clean, modern turquoise-blue palette.
         // Token names kept (terracotta/sage/cream/cocoa) so components need no
-        // changes — only the values are retuned toward muted, natural tones.
+        // changes — only the values are retuned toward cool, vivid tones.
         cream: {
-          // warm oat / stone neutrals
-          50: '#F5F2EA',
-          100: '#EAE3D6',
-          200: '#D9D0BE',
+          // cool, clean neutrals
+          50: '#F2F8F8',
+          100: '#DFEEEE',
+          200: '#C4DEE0',
         },
         terracotta: {
-          // muted clay / adobe — the grounding accent
-          50: '#F1EAE4',
-          100: '#E3D2C6',
-          300: '#CBA48E',
-          400: '#B58369',
-          500: '#9E6A50',
-          600: '#82573F',
-          700: '#674531',
+          // vivid turquoise — the primary accent
+          50: '#E3F6F5',
+          100: '#BEEAE7',
+          300: '#6FCEC7',
+          400: '#3BB8AF',
+          500: '#0FA39A',
+          600: '#0C857D',
+          700: '#096863',
         },
         sage: {
-          // soft olive / eucalyptus — the calming secondary
-          50: '#ECF0E8',
-          100: '#D9E1CD',
-          300: '#A7B98E',
-          400: '#889F6C',
-          500: '#6C8552',
-          600: '#54683F',
+          // deep sky blue — the secondary accent
+          50: '#E8EFF9',
+          100: '#C7D9F1',
+          300: '#83A9DE',
+          400: '#5487CC',
+          500: '#3068B3',
+          600: '#245096',
         },
         cocoa: {
-          // espresso / bark text tones
-          400: '#8A7C6B',
-          600: '#574A3B',
-          800: '#2F271E',
+          // dark blue-slate text tones
+          400: '#5C7B82',
+          600: '#33525A',
+          800: '#152A2E',
         },
       },
       boxShadow: {
-        soft: '0 4px 20px -6px rgba(92, 74, 58, 0.18)',
-        card: '0 6px 24px -8px rgba(92, 74, 58, 0.22)',
-        lift: '0 12px 34px -10px rgba(92, 74, 58, 0.30)',
+        soft: '0 4px 20px -6px rgba(10, 60, 64, 0.16)',
+        card: '0 6px 24px -8px rgba(10, 60, 64, 0.20)',
+        lift: '0 12px 34px -10px rgba(10, 60, 64, 0.28)',
       },
       borderRadius: {
         '2xl': '1.25rem',
