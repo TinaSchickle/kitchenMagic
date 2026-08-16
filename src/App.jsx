@@ -178,7 +178,7 @@ export default function App() {
       </main>
 
       <footer className="text-center text-sm text-cocoa-400 pb-8">
-        made with warmth · kitchenMagic
+        made with love by Tina
       </footer>
     </div>
   )
