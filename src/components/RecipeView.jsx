@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { CATEGORY_MAP } from '../lib/categories'
-import { blockLetter } from '../lib/model'
 import { scaleAmount } from '../lib/scale'
 import PortionStepper, { formatPortions } from './PortionStepper'
+import StepText from './StepText'
 import {
   ArrowLeftIcon,
   BookmarkCheckIcon,
@@ -115,10 +115,19 @@ export default function RecipeView({
         </div>
       </div>
 
-      {/* Blocks */}
-      <div className="flex flex-col gap-4">
-        {recipe.blocks.map((block, i) => (
-          <Block key={block.id} block={block} index={i} portions={portions} />
+      {/* Ingredients */}
+      <IngredientList ingredients={recipe.ingredients} portions={portions} />
+
+      {/* Steps */}
+      <div className="flex flex-col">
+        {recipe.steps.map((step, i) => (
+          <Step
+            key={step.id}
+            step={step}
+            number={i + 1}
+            ingredients={recipe.ingredients}
+            portions={portions}
+          />
         ))}
       </div>
 
@@ -133,66 +142,65 @@ export default function RecipeView({
   )
 }
 
-function Block({ block, index, portions }) {
-  const letter = blockLetter(index)
-  const ingredients = (block.ingredients || []).filter(
+function IngredientList({ ingredients, portions }) {
+  const items = (ingredients || []).filter(
     (ing) => (ing.name && ing.name.trim()) || (ing.amount && ing.amount.trim()),
   )
 
   return (
-    <section className="relative card overflow-hidden">
-      {/* Big greyed watermark letter */}
-      <span
-        aria-hidden
-        className="pointer-events-none select-none absolute -top-4 right-2 font-display font-semibold text-cocoa-800/[0.06] leading-none text-[6rem] sm:text-[11rem]"
-      >
-        {letter}
+    <section className="card p-5 sm:p-7 mb-2">
+      <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-4">
+        Zutaten
+      </p>
+      {items.length ? (
+        <ul className="sm:columns-2 sm:gap-x-8">
+          {items.map((ing) => (
+            <li
+              key={ing.id}
+              className="flex items-baseline gap-3 py-1.5 border-b border-cream-200/60 last:border-0 break-inside-avoid"
+            >
+              <span className="font-semibold text-terracotta-600 tabular-nums whitespace-nowrap">
+                {scaleAmount(ing.amount, portions)}
+              </span>
+              <span className="text-cocoa-800">{ing.name}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-cocoa-400 text-sm italic">No ingredients</p>
+      )}
+    </section>
+  )
+}
+
+// A slim line — number — line divider, like turning to the next step of a
+// recipe card. Numbering runs continuously down the whole recipe.
+function StepDivider({ number }) {
+  return (
+    <div className="flex items-center gap-4 pt-8 pb-5" aria-hidden>
+      <div className="flex-1 h-px bg-cream-200" />
+      <span className="grid place-items-center w-8 h-8 rounded-full bg-cocoa-800/[0.05] text-cocoa-500 text-sm font-bold tabular-nums">
+        {number}
       </span>
+      <div className="flex-1 h-px bg-cream-200" />
+    </div>
+  )
+}
 
-      {/* Always two columns — ingredients left, method right, like a table */}
-      <div className="relative grid grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
-        {/* Left — ingredients */}
-        <div className="p-4 sm:p-6 border-r border-cream-200/70">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="grid place-items-center w-7 h-7 rounded-full bg-terracotta-500 text-white text-sm font-bold shadow-soft">
-              {letter}
-            </span>
-            <span className="text-xs uppercase tracking-wider font-bold text-cocoa-400">
-              Ingredients
-            </span>
-          </div>
-          {ingredients.length ? (
-            <ul className="space-y-2">
-              {ingredients.map((ing) => (
-                <li key={ing.id} className="flex items-baseline gap-3">
-                  <span className="font-semibold text-terracotta-600 tabular-nums whitespace-nowrap">
-                    {scaleAmount(ing.amount, portions)}
-                  </span>
-                  <span className="text-cocoa-800">{ing.name}</span>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-cocoa-400 text-sm italic">No ingredients</p>
-          )}
-        </div>
-
-        {/* Right — process */}
-        <div className="p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-3">
-            <span className="text-xs uppercase tracking-wider font-bold text-cocoa-400">
-              Method
-            </span>
-          </div>
-          {block.instruction && block.instruction.trim() ? (
-            <p className="text-cocoa-800 leading-relaxed whitespace-pre-wrap">
-              {block.instruction}
-            </p>
-          ) : (
-            <p className="text-cocoa-400 text-sm italic">No steps written</p>
-          )}
-        </div>
-      </div>
+function Step({ step, number, ingredients, portions }) {
+  return (
+    <section>
+      <StepDivider number={number} />
+      {step.text && step.text.trim() ? (
+        <StepText
+          text={step.text}
+          ingredients={ingredients}
+          portions={portions}
+          className="text-cocoa-800 leading-relaxed text-lg whitespace-pre-wrap"
+        />
+      ) : (
+        <p className="text-cocoa-400 text-sm italic">No steps written</p>
+      )}
     </section>
   )
 }

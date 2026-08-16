@@ -29,6 +29,11 @@ alter table public.recipes add column if not exists serves integer;
 alter table public.recipes add column if not exists makes integer;
 alter table public.recipes add column if not exists foodprep boolean not null default false;
 
+-- Flat ingredient list + numbered prep steps, replacing the old `blocks`
+-- shape (kept below, untouched, as a backup of the pre-migration data).
+alter table public.recipes add column if not exists ingredients jsonb not null default '[]'::jsonb;
+alter table public.recipes add column if not exists steps jsonb not null default '[]'::jsonb;
+
 create index if not exists recipes_created_at_idx
   on public.recipes (created_at desc);
 

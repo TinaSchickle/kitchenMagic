@@ -7,8 +7,8 @@ export function newIngredient(amount = '', name = '') {
   return { id: uid(), amount, name }
 }
 
-export function newBlock() {
-  return { id: uid(), instruction: '', ingredients: [newIngredient()] }
+export function newStep(text = '') {
+  return { id: uid(), text }
 }
 
 export function newRecipe() {
@@ -21,30 +21,16 @@ export function newRecipe() {
     serves: 4, // "feeds N people"
     makes: null, // "makes N pieces"
     foodprep: false, // "perfect for food prep"
-    blocks: [newBlock()],
+    ingredients: [newIngredient()],
+    steps: [newStep()],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   }
 }
 
-// The block letter shown as a watermark: 0 -> A, 1 -> B, ... 26 -> AA
-export function blockLetter(index) {
-  let n = index
-  let s = ''
-  do {
-    s = String.fromCharCode(65 + (n % 26)) + s
-    n = Math.floor(n / 26) - 1
-  } while (n >= 0)
-  return s
-}
-
 // Flatten all ingredient names of a recipe (lowercased) for filtering/search.
 export function recipeIngredientNames(recipe) {
-  const names = []
-  for (const block of recipe.blocks || []) {
-    for (const ing of block.ingredients || []) {
-      if (ing.name && ing.name.trim()) names.push(ing.name.trim().toLowerCase())
-    }
-  }
-  return names
+  return (recipe.ingredients || [])
+    .map((ing) => (ing.name || '').trim().toLowerCase())
+    .filter(Boolean)
 }

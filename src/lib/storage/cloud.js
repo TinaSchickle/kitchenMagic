@@ -1,7 +1,7 @@
 // Supabase backend. A single shared recipe collection (no login) so the same
 // data appears on every device. Row shape in the `recipes` table:
 //   id (uuid, pk) | title (text) | category (text) | image_url (text)
-//   | blocks (jsonb) | created_at (timestamptz) | updated_at (timestamptz)
+//   | ingredients (jsonb) | steps (jsonb) | created_at | updated_at
 // Images live in the public storage bucket named by IMAGE_BUCKET.
 
 import { createClient } from '@supabase/supabase-js'
@@ -28,7 +28,8 @@ function rowToRecipe(row) {
     serves: row.serves ?? null,
     makes: row.makes ?? null,
     foodprep: row.foodprep ?? false,
-    blocks: row.blocks || [],
+    ingredients: row.ingredients || [],
+    steps: row.steps || [],
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   }
@@ -43,7 +44,8 @@ function recipeToRow(recipe) {
     serves: recipe.serves ?? null,
     makes: recipe.makes ?? null,
     foodprep: recipe.foodprep ?? false,
-    blocks: recipe.blocks || [],
+    ingredients: recipe.ingredients || [],
+    steps: recipe.steps || [],
     updated_at: new Date().toISOString(),
   }
 }

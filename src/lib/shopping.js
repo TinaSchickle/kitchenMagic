@@ -13,19 +13,17 @@ export function buildShoppingList(planner, recipes) {
   for (const entry of planner) {
     const recipe = byId.get(entry.recipeId)
     if (!recipe) continue
-    for (const block of recipe.blocks || []) {
-      for (const ing of block.ingredients || []) {
-        const name = (ing.name || '').trim()
-        if (!name) continue
-        const key = name.toLowerCase()
-        if (!map.has(key)) {
-          map.set(key, { key, name, amounts: [], sources: new Set() })
-        }
-        const item = map.get(key)
-        const amount = scaleAmount(ing.amount, entry.portions)
-        if (amount && amount.trim()) item.amounts.push(amount.trim())
-        item.sources.add(recipe.title || 'Untitled recipe')
+    for (const ing of recipe.ingredients || []) {
+      const name = (ing.name || '').trim()
+      if (!name) continue
+      const key = name.toLowerCase()
+      if (!map.has(key)) {
+        map.set(key, { key, name, amounts: [], sources: new Set() })
       }
+      const item = map.get(key)
+      const amount = scaleAmount(ing.amount, entry.portions)
+      if (amount && amount.trim()) item.amounts.push(amount.trim())
+      item.sources.add(recipe.title || 'Untitled recipe')
     }
   }
 

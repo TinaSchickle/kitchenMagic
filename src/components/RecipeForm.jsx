@@ -1,11 +1,6 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { CATEGORIES } from '../lib/categories'
-import {
-  blockLetter,
-  newBlock,
-  newIngredient,
-  newRecipe,
-} from '../lib/model'
+import { newIngredient, newRecipe, newStep } from '../lib/model'
 import { uploadImage } from '../lib/storage'
 import {
   ArrowLeftIcon,
@@ -15,6 +10,7 @@ import {
   TrashIcon,
   XIcon,
 } from './icons'
+import StepText from './StepText'
 
 // Deep clone so edits don't mutate the stored recipe until saved.
 function cloneOrNew(initial) {
@@ -32,63 +28,39 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
 
   const patch = (fields) => setRecipe((r) => ({ ...r, ...fields }))
 
-  const updateBlock = (blockId, fields) =>
+  const updateIngredient = (ingId, fields) =>
     setRecipe((r) => ({
       ...r,
-      blocks: r.blocks.map((b) => (b.id === blockId ? { ...b, ...fields } : b)),
-    }))
-
-  const updateIngredient = (blockId, ingId, fields) =>
-    setRecipe((r) => ({
-      ...r,
-      blocks: r.blocks.map((b) =>
-        b.id === blockId
-          ? {
-              ...b,
-              ingredients: b.ingredients.map((ing) =>
-                ing.id === ingId ? { ...ing, ...fields } : ing,
-              ),
-            }
-          : b,
+      ingredients: r.ingredients.map((ing) =>
+        ing.id === ingId ? { ...ing, ...fields } : ing,
       ),
     }))
 
-  const addIngredient = (blockId) =>
+  const addIngredient = () =>
+    setRecipe((r) => ({ ...r, ingredients: [...r.ingredients, newIngredient()] }))
+
+  const removeIngredient = (ingId) =>
     setRecipe((r) => ({
       ...r,
-      blocks: r.blocks.map((b) =>
-        b.id === blockId
-          ? { ...b, ingredients: [...b.ingredients, newIngredient()] }
-          : b,
-      ),
+      ingredients:
+        r.ingredients.length > 1
+          ? r.ingredients.filter((ing) => ing.id !== ingId)
+          : r.ingredients,
     }))
 
-  const removeIngredient = (blockId, ingId) =>
+  const updateStep = (stepId, text) =>
     setRecipe((r) => ({
       ...r,
-      blocks: r.blocks.map((b) =>
-        b.id === blockId
-          ? {
-              ...b,
-              ingredients:
-                b.ingredients.length > 1
-                  ? b.ingredients.filter((ing) => ing.id !== ingId)
-                  : b.ingredients,
-            }
-          : b,
-      ),
+      steps: r.steps.map((s) => (s.id === stepId ? { ...s, text } : s)),
     }))
 
-  const addBlock = () =>
-    setRecipe((r) => ({ ...r, blocks: [...r.blocks, newBlock()] }))
+  const addStep = () =>
+    setRecipe((r) => ({ ...r, steps: [...r.steps, newStep()] }))
 
-  const removeBlock = (blockId) =>
+  const removeStep = (stepId) =>
     setRecipe((r) => ({
       ...r,
-      blocks:
-        r.blocks.length > 1
-          ? r.blocks.filter((b) => b.id !== blockId)
-          : r.blocks,
+      steps: r.steps.length > 1 ? r.steps.filter((s) => s.id !== stepId) : r.steps,
     }))
 
   const onPickImage = async (e) => {
@@ -113,12 +85,9 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
     const cleaned = {
       ...recipe,
       title: recipe.title.trim(),
-      blocks: recipe.blocks.map((b) => ({
-        ...b,
-        ingredients: b.ingredients.filter(
-          (ing) => ing.name.trim() || ing.amount.trim(),
-        ),
-      })),
+      ingredients: recipe.ingredients.filter(
+        (ing) => ing.name.trim() || ing.amount.trim(),
+      ),
     }
     try {
       setSaving(true)
@@ -261,31 +230,73 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         />
       </div>
 
-      {/* Blocks */}
+      {/* Ingredients */}
+      <section className="card p-5 sm:p-6 mb-4">
+        <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-3">
+          Zutaten
+        </p>
+        <div className="space-y-2">
+          {recipe.ingredients.map((ing) => (
+            <div key={ing.id} className="flex items-center gap-2">
+              <input
+                value={ing.amount}
+                onChange={(e) =>
+                  updateIngredient(ing.id, { amount: e.target.value })
+                }
+                placeholder="200 g"
+                className="field w-24 flex-shrink-0 px-2.5 py-2 text-center"
+                aria-label="Amount (optional)"
+              />
+              <input
+                value={ing.name}
+                onChange={(e) => updateIngredient(ing.id, { name: e.target.value })}
+                placeholder="Mehl"
+                className="field px-3 py-2"
+                aria-label="Ingredient"
+              />
+              <button
+                onClick={() => removeIngredient(ing.id)}
+                className="text-cocoa-400 hover:text-terracotta-500 p-1 flex-shrink-0"
+                aria-label="Remove ingredient"
+              >
+                <XIcon width={16} height={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={addIngredient}
+          className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-sage-600 hover:text-sage-600/80"
+        >
+          <PlusIcon width={16} height={16} />
+          Add ingredient
+        </button>
+        <p className="text-xs text-cocoa-400 mt-2">
+          Amount is optional — leave it blank for things like "salt".
+        </p>
+      </section>
+
+      {/* Steps */}
       <div className="flex flex-col gap-4">
-        {recipe.blocks.map((block, i) => (
-          <BlockEditor
-            key={block.id}
-            block={block}
-            letter={blockLetter(i)}
-            canRemove={recipe.blocks.length > 1}
-            onChangeInstruction={(v) => updateBlock(block.id, { instruction: v })}
-            onChangeIngredient={(ingId, fields) =>
-              updateIngredient(block.id, ingId, fields)
-            }
-            onAddIngredient={() => addIngredient(block.id)}
-            onRemoveIngredient={(ingId) => removeIngredient(block.id, ingId)}
-            onRemoveBlock={() => removeBlock(block.id)}
+        {recipe.steps.map((step, i) => (
+          <StepEditor
+            key={step.id}
+            step={step}
+            number={i + 1}
+            canRemove={recipe.steps.length > 1}
+            ingredients={recipe.ingredients}
+            onChangeText={(v) => updateStep(step.id, v)}
+            onRemoveStep={() => removeStep(step.id)}
           />
         ))}
       </div>
 
       <button
-        onClick={addBlock}
+        onClick={addStep}
         className="btn-soft w-full mt-4 py-3 border-2 border-dashed border-sage-300 bg-sage-50 hover:bg-sage-100"
       >
         <PlusIcon width={18} height={18} />
-        Add another block
+        Add step
       </button>
 
       {/* Bottom save for long forms */}
@@ -340,101 +351,61 @@ function ImagePicker({ image, uploading, onPick, onRemove }) {
   )
 }
 
-function BlockEditor({
-  block,
-  letter,
+function StepEditor({
+  step,
+  number,
   canRemove,
-  onChangeInstruction,
-  onChangeIngredient,
-  onAddIngredient,
-  onRemoveIngredient,
-  onRemoveBlock,
+  ingredients,
+  onChangeText,
+  onRemoveStep,
 }) {
   return (
     <section className="card p-5 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <span className="grid place-items-center w-8 h-8 rounded-full bg-terracotta-500 text-white font-bold shadow-soft">
-            {letter}
+          <span className="grid place-items-center w-8 h-8 rounded-full bg-terracotta-500 text-white font-bold shadow-soft tabular-nums">
+            {number}
           </span>
           <span className="text-sm font-bold text-cocoa-600">
-            Block {letter}
+            Step {number}
           </span>
         </div>
         {canRemove && (
           <button
-            onClick={onRemoveBlock}
+            onClick={onRemoveStep}
             className="text-cocoa-400 hover:text-terracotta-500 p-1"
-            aria-label={`Remove block ${letter}`}
+            aria-label={`Remove step ${number}`}
           >
             <TrashIcon width={18} height={18} />
           </button>
         )}
       </div>
 
-      <div className="grid sm:grid-cols-2 gap-5">
-        {/* Ingredients */}
-        <div>
-          <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-2">
-            Ingredients
-          </p>
-          <div className="space-y-2">
-            {block.ingredients.map((ing) => (
-              <div key={ing.id} className="flex items-center gap-2">
-                <input
-                  value={ing.amount}
-                  onChange={(e) =>
-                    onChangeIngredient(ing.id, { amount: e.target.value })
-                  }
-                  placeholder="200g"
-                  className="field w-20 flex-shrink-0 px-2.5 py-2 text-center"
-                  aria-label="Amount (optional)"
-                />
-                <input
-                  value={ing.name}
-                  onChange={(e) =>
-                    onChangeIngredient(ing.id, { name: e.target.value })
-                  }
-                  placeholder="flour"
-                  className="field px-3 py-2"
-                  aria-label="Ingredient"
-                />
-                <button
-                  onClick={() => onRemoveIngredient(ing.id)}
-                  className="text-cocoa-400 hover:text-terracotta-500 p-1 flex-shrink-0"
-                  aria-label="Remove ingredient"
-                >
-                  <XIcon width={16} height={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-          <button
-            onClick={onAddIngredient}
-            className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-sage-600 hover:text-sage-600/80"
-          >
-            <PlusIcon width={16} height={16} />
-            Add ingredient
-          </button>
-          <p className="text-xs text-cocoa-400 mt-2">
-            Amount is optional — leave it blank for things like “salt”.
-          </p>
-        </div>
+      <textarea
+        value={step.text}
+        onChange={(e) => onChangeText(e.target.value)}
+        rows={4}
+        placeholder="Mehl mit [Milch] verrühren, dann [Salz] unterheben…"
+        className="field resize-y leading-relaxed"
+      />
+      <p className="text-xs text-cocoa-400 mt-2">
+        Menge einfügen: Zutatname in eckigen Klammern schreiben, genau wie
+        oben in der Zutatenliste, z. B. [Milch].
+      </p>
 
-        {/* Method */}
-        <div>
-          <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-2">
-            Method
+      {step.text.trim() && (
+        <div className="mt-3 pt-3 border-t border-cream-200/70">
+          <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-1.5">
+            Vorschau
           </p>
-          <textarea
-            value={block.instruction}
-            onChange={(e) => onChangeInstruction(e.target.value)}
-            rows={6}
-            placeholder={`How to process block ${letter}…\ne.g. Mix block A into ${letter}, then fold gently.`}
-            className="field resize-y leading-relaxed"
+          <StepText
+            text={step.text}
+            ingredients={ingredients}
+            portions={1}
+            className="text-cocoa-700 leading-relaxed whitespace-pre-wrap"
           />
         </div>
-      </div>
+      )}
     </section>
   )
 }
