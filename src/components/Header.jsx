@@ -1,5 +1,5 @@
 import { isCloud } from '../lib/storage'
-import { BookIcon, CalendarIcon, PlusIcon, SparkleIcon } from './icons'
+import { BookIcon, CalendarIcon, PlusIcon } from './icons'
 
 export default function Header({
   onLogoClick,
@@ -19,9 +19,11 @@ export default function Header({
           className="flex items-center gap-2 group flex-shrink-0"
           aria-label="Go to all recipes"
         >
-          <span className="grid place-items-center w-9 h-9 rounded-2xl bg-terracotta-500 text-white shadow-soft group-active:scale-95 transition">
-            <SparkleIcon width={20} height={20} />
-          </span>
+          <img
+            src="/favicon.svg"
+            alt=""
+            className="w-9 h-9 rounded-2xl shadow-soft group-active:scale-95 transition"
+          />
           <span className="hidden sm:inline font-display text-2xl font-semibold text-cocoa-800 tracking-tight">
             kitchen<span className="text-terracotta-500">Magic</span>
           </span>

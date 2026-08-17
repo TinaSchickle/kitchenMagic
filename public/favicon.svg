@@ -1,5 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <rect width="64" height="64" rx="16" fill="#0FA39A"/>
-  <path d="M32 13l4.2 11.3L47 28.5l-10.8 4.2L32 44l-4.2-11.3L17 28.5l10.8-4.2z" fill="#F2F8F8"/>
+  <!-- chef hat: poofy top + cuff -->
+  <g fill="#F2F8F8">
+    <circle cx="24" cy="22" r="11"/>
+    <circle cx="15" cy="20" r="6.3"/>
+    <circle cx="33" cy="20" r="6.3"/>
+    <circle cx="24" cy="12" r="5.6"/>
+    <rect x="13" y="30" width="22" height="12" rx="3"/>
+  </g>
+  <!-- sparkle: the "magic" -->
   <path d="M46 38l1.8 4.8L52 44.6l-4.2 1.8L46 51l-1.8-4.6L40 44.6l4.2-1.8z" fill="#C7D9F1"/>
 </svg>
