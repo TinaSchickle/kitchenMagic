@@ -4,7 +4,7 @@ import { uid } from './uid'
 // both storage backends and the form agree on the structure.
 
 export function newIngredient(amount = '', name = '') {
-  return { id: uid(), amount, name }
+  return { id: uid(), amount, name, optional: false }
 }
 
 export function newStep(text = '') {
@@ -21,6 +21,7 @@ export function newRecipe() {
     serves: 4, // "feeds N people"
     makes: null, // "makes N pieces"
     foodprep: false, // "perfect for food prep"
+    comment: '', // shown above the ingredient list, only when non-empty
     ingredients: [newIngredient()],
     steps: [newStep()],
     createdAt: new Date().toISOString(),

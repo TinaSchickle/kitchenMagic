@@ -230,6 +230,24 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         />
       </div>
 
+      {/* Comment */}
+      <section className="card p-5 sm:p-6 mb-4">
+        <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-3">
+          Kommentar
+        </p>
+        <textarea
+          value={recipe.comment}
+          onChange={(e) => patch({ comment: e.target.value })}
+          rows={3}
+          placeholder="z. B. eine Anmerkung zu diesem Rezept…"
+          className="field resize-y leading-relaxed"
+        />
+        <p className="text-xs text-cocoa-400 mt-2">
+          Wird nur angezeigt, wenn hier etwas steht — sonst bleibt der Block
+          auf der Rezeptseite komplett ausgeblendet.
+        </p>
+      </section>
+
       {/* Ingredients */}
       <section className="card p-5 sm:p-6 mb-4">
         <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-3">
@@ -254,6 +272,21 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
                 className="field px-3 py-2"
                 aria-label="Ingredient"
               />
+              <button
+                onClick={() =>
+                  updateIngredient(ing.id, { optional: !ing.optional })
+                }
+                aria-pressed={Boolean(ing.optional)}
+                aria-label="Mark as optional"
+                title="Optional"
+                className={`flex-shrink-0 text-xs font-bold px-2.5 py-2 rounded-xl transition ${
+                  ing.optional
+                    ? 'bg-cocoa-600 text-white'
+                    : 'bg-cream-100 text-cocoa-400 hover:bg-cream-200'
+                }`}
+              >
+                opt.
+              </button>
               <button
                 onClick={() => removeIngredient(ing.id)}
                 className="text-cocoa-400 hover:text-terracotta-500 p-1 flex-shrink-0"

@@ -34,6 +34,9 @@ alter table public.recipes add column if not exists foodprep boolean not null de
 alter table public.recipes add column if not exists ingredients jsonb not null default '[]'::jsonb;
 alter table public.recipes add column if not exists steps jsonb not null default '[]'::jsonb;
 
+-- Optional free-text note shown above the ingredient list (hidden when empty).
+alter table public.recipes add column if not exists comment text not null default '';
+
 create index if not exists recipes_created_at_idx
   on public.recipes (created_at desc);
 

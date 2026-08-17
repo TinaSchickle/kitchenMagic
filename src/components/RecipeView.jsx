@@ -115,6 +115,18 @@ export default function RecipeView({
         </div>
       </div>
 
+      {/* Comment — only shown when someone actually wrote one */}
+      {recipe.comment && recipe.comment.trim() && (
+        <section className="card p-5 sm:p-7 mb-2 border-l-4 border-terracotta-300">
+          <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-2">
+            Kommentar
+          </p>
+          <p className="text-cocoa-700 leading-relaxed whitespace-pre-wrap">
+            {recipe.comment}
+          </p>
+        </section>
+      )}
+
       {/* Ingredients */}
       <IngredientList ingredients={recipe.ingredients} portions={portions} />
 
@@ -163,6 +175,11 @@ function IngredientList({ ingredients, portions }) {
                 {scaleAmount(ing.amount, portions)}
               </span>
               <span className="text-cocoa-800">{ing.name}</span>
+              {ing.optional && (
+                <span className="ml-auto flex-shrink-0 text-[0.65rem] uppercase tracking-wider font-bold text-cocoa-400 bg-cream-100 rounded-full px-2 py-0.5">
+                  optional
+                </span>
+              )}
             </li>
           ))}
         </ul>

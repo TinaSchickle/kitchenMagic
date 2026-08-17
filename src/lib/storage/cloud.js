@@ -1,7 +1,7 @@
 // Supabase backend. A single shared recipe collection (no login) so the same
 // data appears on every device. Row shape in the `recipes` table:
 //   id (uuid, pk) | title (text) | category (text) | image_url (text)
-//   | ingredients (jsonb) | steps (jsonb) | created_at | updated_at
+//   | comment (text) | ingredients (jsonb) | steps (jsonb) | created_at | updated_at
 // Images live in the public storage bucket named by IMAGE_BUCKET.
 
 import { createClient } from '@supabase/supabase-js'
@@ -28,6 +28,7 @@ function rowToRecipe(row) {
     serves: row.serves ?? null,
     makes: row.makes ?? null,
     foodprep: row.foodprep ?? false,
+    comment: row.comment || '',
     ingredients: row.ingredients || [],
     steps: row.steps || [],
     createdAt: row.created_at,
@@ -44,6 +45,7 @@ function recipeToRow(recipe) {
     serves: recipe.serves ?? null,
     makes: recipe.makes ?? null,
     foodprep: recipe.foodprep ?? false,
+    comment: recipe.comment || '',
     ingredients: recipe.ingredients || [],
     steps: recipe.steps || [],
     updated_at: new Date().toISOString(),
@@ -70,7 +72,7 @@ export async function getRecipe(id) {
 }
 
 // Optional columns that may not exist yet in an older database.
-const OPTIONAL_COLUMNS = ['serves', 'makes', 'foodprep']
+const OPTIONAL_COLUMNS = ['serves', 'makes', 'foodprep', 'comment']
 
 export async function saveRecipe(recipe) {
   let attempt = recipeToRow(recipe)

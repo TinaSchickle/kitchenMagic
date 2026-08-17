@@ -32,9 +32,10 @@ export function resolveStepText(text, ingredients, portions) {
     const ing = byName.get(name.toLowerCase())
     if (ing) {
       const amount = scaleAmount(ing.amount, portions).trim()
+      const resolved = amount ? `${amount} ${ing.name}` : ing.name
       segments.push({
         type: 'ref',
-        value: amount ? `${amount} ${ing.name}` : ing.name,
+        value: ing.optional ? `${resolved} (opt.)` : resolved,
       })
     } else {
       segments.push({ type: 'missing', value: name })
