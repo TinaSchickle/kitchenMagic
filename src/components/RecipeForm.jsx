@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { CATEGORIES } from '../lib/categories'
 import { newIngredient, newRecipe, newStep } from '../lib/model'
 import { uploadImage } from '../lib/storage'
@@ -384,6 +384,21 @@ function ImagePicker({ image, uploading, onPick, onRemove }) {
   )
 }
 
+// If the cursor sits right after an unclosed "[", returns where the
+// reference query starts and what's been typed so far — so we know what to
+// autocomplete against. Returns null outside of an open "[...".
+function openBracketQuery(text, cursor) {
+  if (cursor == null) return null
+  const uptoCursor = text.slice(0, cursor)
+  const lastOpen = uptoCursor.lastIndexOf('[')
+  if (lastOpen === -1) return null
+  const lastClose = uptoCursor.lastIndexOf(']')
+  if (lastClose > lastOpen) return null // already closed again since then
+  const query = uptoCursor.slice(lastOpen + 1)
+  if (query.includes('\n')) return null
+  return { start: lastOpen + 1, query }
+}
+
 function StepEditor({
   step,
   number,
@@ -392,6 +407,34 @@ function StepEditor({
   onChangeText,
   onRemoveStep,
 }) {
+  const textareaRef = useRef(null)
+  const [cursor, setCursor] = useState(null)
+
+  const trackCursor = (e) => setCursor(e.target.selectionStart)
+
+  const suggestion = openBracketQuery(step.text, cursor)
+  const matches = suggestion
+    ? (ingredients || []).filter(
+        (ing) =>
+          ing.name && ing.name.toLowerCase().includes(suggestion.query.toLowerCase()),
+      )
+    : []
+
+  const pickSuggestion = (name) => {
+    const before = step.text.slice(0, suggestion.start)
+    const after = step.text.slice(cursor)
+    const newText = `${before}${name}]${after}`
+    onChangeText(newText)
+    const newCursor = before.length + name.length + 1
+    requestAnimationFrame(() => {
+      const el = textareaRef.current
+      if (!el) return
+      el.focus()
+      el.setSelectionRange(newCursor, newCursor)
+      setCursor(newCursor)
+    })
+  }
+
   return (
     <section className="card p-5 sm:p-6">
       <div className="flex items-center justify-between mb-3">
@@ -414,16 +457,51 @@ function StepEditor({
         )}
       </div>
 
-      <textarea
-        value={step.text}
-        onChange={(e) => onChangeText(e.target.value)}
-        rows={4}
-        placeholder="Mehl mit [Milch] verrühren, dann [Salz] unterheben…"
-        className="field resize-y leading-relaxed"
-      />
+      <div className="relative">
+        <textarea
+          ref={textareaRef}
+          value={step.text}
+          onChange={(e) => {
+            onChangeText(e.target.value)
+            trackCursor(e)
+          }}
+          onKeyUp={trackCursor}
+          onClick={trackCursor}
+          onBlur={() => setTimeout(() => setCursor(null), 150)}
+          rows={4}
+          placeholder="Mehl mit [Milch] verrühren, dann [Salz] unterheben…"
+          className="field resize-y leading-relaxed"
+        />
+        {suggestion && (
+          <div className="absolute z-10 left-0 right-0 mt-1 card p-1.5 max-h-52 overflow-y-auto shadow-lift">
+            {matches.length ? (
+              matches.map((ing) => (
+                <button
+                  key={ing.id}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => pickSuggestion(ing.name)}
+                  className="w-full flex items-center justify-between gap-3 px-2.5 py-1.5 rounded-lg hover:bg-terracotta-50 text-left"
+                >
+                  <span className="text-sm text-cocoa-800">{ing.name}</span>
+                  {ing.amount && (
+                    <span className="text-xs text-cocoa-400 tabular-nums whitespace-nowrap">
+                      {ing.amount}
+                    </span>
+                  )}
+                </button>
+              ))
+            ) : (
+              <p className="text-xs text-cocoa-400 px-2.5 py-1.5">
+                Keine passende Zutat
+              </p>
+            )}
+          </div>
+        )}
+      </div>
       <p className="text-xs text-cocoa-400 mt-2">
         Menge einfügen: Zutatname in eckigen Klammern schreiben, genau wie
-        oben in der Zutatenliste, z. B. [Milch].
+        oben in der Zutatenliste, z. B. [Milch] — oder einfach [ tippen für
+        Vorschläge.
       </p>
 
       {step.text.trim() && (
