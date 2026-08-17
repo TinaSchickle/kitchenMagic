@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import html2canvas from 'html2canvas'
 import { CATEGORY_MAP } from '../lib/categories'
 import { scaleAmount } from '../lib/scale'
 import PortionStepper, { formatPortions } from './PortionStepper'
@@ -8,9 +9,40 @@ import {
   BookmarkCheckIcon,
   BookmarkIcon,
   PencilIcon,
+  ShareIcon,
   TrashIcon,
   XIcon,
 } from './icons'
+
+// Renders the recipe card to a PNG and hands it to the OS share sheet (falls
+// back to a plain download where Web Share doesn't support files, e.g. most
+// desktop browsers).
+async function shareRecipeImage(node, title) {
+  const canvas = await html2canvas(node, {
+    backgroundColor: '#F2F8F8',
+    useCORS: true,
+    scale: 1.5,
+    windowWidth: document.documentElement.offsetWidth,
+    windowHeight: document.documentElement.offsetHeight,
+  })
+  const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
+  if (!blob) throw new Error('Could not create image')
+
+  const filename = `${(title || 'Rezept').replace(/[\\/:*?"<>|]+/g, ' ').trim()}.png`
+  const file = new File([blob], filename, { type: 'image/png' })
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    await navigator.share({ files: [file], title: title || 'Rezept' })
+    return
+  }
+
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 export default function RecipeView({
   recipe,
@@ -22,7 +54,27 @@ export default function RecipeView({
 }) {
   const [portions, setPortions] = useState(1)
   const [confirming, setConfirming] = useState(false)
+  const [sharing, setSharing] = useState(false)
   const cat = CATEGORY_MAP[recipe.category]
+  const shareRef = useRef(null)
+
+  const handleShare = async () => {
+    if (!shareRef.current || sharing) return
+    setSharing(true)
+    // Wait for the sharing-mode DOM swap (interactive stepper -> static text)
+    // to actually paint before html2canvas reads the node.
+    await new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(resolve)))
+    try {
+      await shareRecipeImage(shareRef.current, recipe.title)
+    } catch (err) {
+      if (err?.name !== 'AbortError') {
+        console.error(err)
+        alert('Teilen hat nicht geklappt: ' + (err.message || err))
+      }
+    } finally {
+      setSharing(false)
+    }
+  }
 
   return (
     <div className="pt-4 sm:pt-6">
@@ -50,6 +102,12 @@ export default function RecipeView({
               {isPlanned ? 'In planner' : 'Add to planner'}
             </span>
           </button>
+          <button className="btn-ghost" onClick={handleShare} disabled={sharing}>
+            <ShareIcon width={18} height={18} />
+            <span className="hidden sm:inline">
+              {sharing ? 'Erstelle Bild…' : 'Teilen'}
+            </span>
+          </button>
           <button className="btn-ghost" onClick={onEdit}>
             <PencilIcon width={18} height={18} />
             <span className="hidden sm:inline">Edit</span>
@@ -64,83 +122,91 @@ export default function RecipeView({
         </div>
       </div>
 
-      {/* Hero */}
-      <div className="card overflow-hidden mb-6">
-        {recipe.image && (
-          <div className="aspect-[16/9] sm:aspect-[21/9] overflow-hidden">
-            <img
-              src={recipe.image}
-              alt={recipe.title}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-        <div className="p-5 sm:p-7 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-          <div>
-            <div className="flex flex-wrap items-center gap-2 mb-3">
-              {cat && (
-                <span className="chip bg-sage-100 text-sage-600">
-                  <span>{cat.emoji}</span>
-                  {cat.label}
-                </span>
-              )}
-              {recipe.foodprep && (
-                <span className="chip bg-terracotta-100 text-terracotta-700">
-                  {'\u{1F961}'} Food-prep friendly
-                </span>
-              )}
+      <div ref={shareRef}>
+        {/* Hero */}
+        <div className="card overflow-hidden mb-6">
+          {recipe.image && (
+            <div className="aspect-[16/9] sm:aspect-[21/9] overflow-hidden">
+              <img
+                src={recipe.image}
+                alt={recipe.title}
+                className="w-full h-full object-cover"
+              />
             </div>
-            <h1 className="font-display text-3xl sm:text-4xl font-semibold text-cocoa-800 leading-tight">
-              {recipe.title || 'Untitled recipe'}
-            </h1>
-          </div>
-          <div className="flex-shrink-0">
-            <p className="text-sm text-cocoa-400 mb-1 sm:text-right">Portions</p>
-            <PortionStepper value={portions} onChange={setPortions} />
-            {recipe.serves ? (
-              <p className="text-sm text-cocoa-600 mt-2 sm:text-right">
-                <span aria-hidden>{'\u{1F37D}️'} </span>
-                Feeds {formatPortions(recipe.serves * portions)}{' '}
-                {recipe.serves * portions === 1 ? 'person' : 'people'}
-              </p>
-            ) : null}
-            {recipe.makes ? (
-              <p className="text-sm text-cocoa-600 mt-1 sm:text-right">
-                <span aria-hidden>{'\u{1F9C1}'} </span>
-                Makes {formatPortions(recipe.makes * portions)}{' '}
-                {recipe.makes * portions === 1 ? 'piece' : 'pieces'}
-              </p>
-            ) : null}
+          )}
+          <div className="p-5 sm:p-7 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+              <div className="flex flex-wrap items-center gap-2 mb-3">
+                {cat && (
+                  <span className="chip bg-sage-100 text-sage-600">
+                    <span>{cat.emoji}</span>
+                    {cat.label}
+                  </span>
+                )}
+                {recipe.foodprep && (
+                  <span className="chip bg-terracotta-100 text-terracotta-700">
+                    {'\u{1F961}'} Food-prep friendly
+                  </span>
+                )}
+              </div>
+              <h1 className="font-display text-3xl sm:text-4xl font-semibold text-cocoa-800 leading-tight">
+                {recipe.title || 'Untitled recipe'}
+              </h1>
+            </div>
+            <div className="flex-shrink-0">
+              <p className="text-sm text-cocoa-400 mb-1 sm:text-right">Portions</p>
+              {sharing ? (
+                <p className="text-lg font-semibold text-cocoa-800 sm:text-right">
+                  {formatPortions(portions)}×
+                </p>
+              ) : (
+                <PortionStepper value={portions} onChange={setPortions} />
+              )}
+              {recipe.serves ? (
+                <p className="text-sm text-cocoa-600 mt-2 sm:text-right">
+                  <span aria-hidden>{'\u{1F37D}️'} </span>
+                  Feeds {formatPortions(recipe.serves * portions)}{' '}
+                  {recipe.serves * portions === 1 ? 'person' : 'people'}
+                </p>
+              ) : null}
+              {recipe.makes ? (
+                <p className="text-sm text-cocoa-600 mt-1 sm:text-right">
+                  <span aria-hidden>{'\u{1F9C1}'} </span>
+                  Makes {formatPortions(recipe.makes * portions)}{' '}
+                  {recipe.makes * portions === 1 ? 'piece' : 'pieces'}
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Comment — only shown when someone actually wrote one */}
-      {recipe.comment && recipe.comment.trim() && (
-        <section className="card p-5 sm:p-7 mb-2 border-l-4 border-terracotta-300">
-          <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-2">
-            Kommentar
-          </p>
-          <p className="text-cocoa-700 leading-relaxed whitespace-pre-wrap">
-            {recipe.comment}
-          </p>
-        </section>
-      )}
+        {/* Comment — only shown when someone actually wrote one */}
+        {recipe.comment && recipe.comment.trim() && (
+          <section className="card p-5 sm:p-7 mb-2 border-l-4 border-terracotta-300">
+            <p className="text-xs uppercase tracking-wider font-bold text-cocoa-400 mb-2">
+              Kommentar
+            </p>
+            <p className="text-cocoa-700 leading-relaxed whitespace-pre-wrap">
+              {recipe.comment}
+            </p>
+          </section>
+        )}
 
-      {/* Ingredients */}
-      <IngredientList ingredients={recipe.ingredients} portions={portions} />
+        {/* Ingredients */}
+        <IngredientList ingredients={recipe.ingredients} portions={portions} />
 
-      {/* Steps */}
-      <div className="flex flex-col">
-        {recipe.steps.map((step, i) => (
-          <Step
-            key={step.id}
-            step={step}
-            number={i + 1}
-            ingredients={recipe.ingredients}
-            portions={portions}
-          />
-        ))}
+        {/* Steps */}
+        <div className="flex flex-col">
+          {recipe.steps.map((step, i) => (
+            <Step
+              key={step.id}
+              step={step}
+              number={i + 1}
+              ingredients={recipe.ingredients}
+              portions={portions}
+            />
+          ))}
+        </div>
       </div>
 
       {confirming && (

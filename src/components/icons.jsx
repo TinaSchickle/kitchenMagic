@@ -152,6 +152,15 @@ export const CalendarIcon = (p) => (
   </svg>
 )
 
+export const ShareIcon = (p) => (
+  <svg {...base} {...p}>
+    <circle cx="18" cy="5" r="3" />
+    <circle cx="6" cy="12" r="3" />
+    <circle cx="18" cy="19" r="3" />
+    <path d="M8.6 10.5l6.8-3.9M8.6 13.5l6.8 3.9" />
+  </svg>
+)
+
 export const BookIcon = (p) => (
   <svg {...base} {...p}>
     <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
