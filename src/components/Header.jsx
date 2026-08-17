@@ -20,7 +20,7 @@ export default function Header({
           aria-label="Go to all recipes"
         >
           <img
-            src="/favicon.svg"
+            src="/icons/icon-192.png"
             alt=""
             className="w-9 h-9 rounded-2xl shadow-soft group-active:scale-95 transition"
           />
