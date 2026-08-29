@@ -13,5 +13,7 @@ export const SUPABASE_ANON_KEY =
   import.meta.env.VITE_SUPABASE_ANON_KEY || ANON_KEY
 
 export const IMAGE_BUCKET = 'recipe-images'
+// Rezeptfotos, die noch abgetippt werden müssen (Foto-Inbox, 3. Tab).
+export const INBOX_BUCKET = 'recipe-inbox'
 
 export const isCloudConfigured = Boolean(SUPABASE_URL && SUPABASE_ANON_KEY)
