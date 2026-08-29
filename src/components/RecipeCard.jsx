@@ -28,8 +28,8 @@ function PlanButton({ planned, onClick, className = '' }) {
   return (
     <button
       onClick={onClick}
-      aria-label={planned ? 'Remove from planner' : 'Add to planner'}
-      title={planned ? 'In planner' : 'Add to planner'}
+      aria-label={planned ? 'Aus dem Planer entfernen' : 'Zum Planer hinzufügen'}
+      title={planned ? 'Im Planer' : 'Zum Planer hinzufügen'}
       className={`grid place-items-center w-9 h-9 rounded-full transition shadow-soft ${
         planned
           ? 'bg-sage-500 text-white hover:bg-sage-600'
@@ -67,15 +67,15 @@ export function GalleryCard({ recipe, onOpen, planned, onTogglePlan }) {
         </div>
         <div className="p-4">
           <h3 className="font-display text-lg font-semibold text-cocoa-800 leading-snug line-clamp-2">
-            {recipe.title || 'Untitled recipe'}
+            {recipe.title || 'Rezept ohne Titel'}
           </h3>
           <div className="flex items-center gap-2 mt-1">
             <p className="text-sm text-cocoa-400">
-              {count} {count === 1 ? 'ingredient' : 'ingredients'}
+              {count} {count === 1 ? 'Zutat' : 'Zutaten'}
             </p>
             {recipe.foodprep && (
               <span className="chip bg-terracotta-100 text-terracotta-700 text-xs py-0.5">
-                {'\u{1F961}'} prep
+                {'\u{1F961}'} Vorkochen
               </span>
             )}
           </div>
@@ -112,12 +112,12 @@ export function ListRow({ recipe, onOpen, planned, onTogglePlan }) {
         </div>
         <div className="min-w-0 flex-1">
           <h3 className="font-display text-lg font-semibold text-cocoa-800 truncate">
-            {recipe.title || 'Untitled recipe'}
+            {recipe.title || 'Rezept ohne Titel'}
           </h3>
           <p className="text-sm text-cocoa-400">
             {cat ? `${cat.emoji} ${cat.label}` : ''}
             {recipe.foodprep && (
-              <span className="text-terracotta-600"> · {'\u{1F961}'} food prep</span>
+              <span className="text-terracotta-600"> · {'\u{1F961}'} Vorkochen</span>
             )}
           </p>
         </div>

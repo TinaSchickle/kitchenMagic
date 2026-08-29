@@ -80,25 +80,21 @@ export default function Overview({
 
   return (
     <div className="mt-4">
-      {/* Category tabs — all visible (wrapping), even on mobile */}
-      <div className="flex flex-wrap gap-2 mb-3">
-        <Tab
-          label="All"
-          active={category === 'all'}
-          count={counts.all}
-          onClick={() => setCategory('all')}
-          allTab
-        />
-        {CATEGORIES.map((cat) => (
-          <Tab
-            key={cat.id}
-            label={cat.label}
-            emoji={cat.emoji}
-            active={category === cat.id}
-            count={counts[cat.id]}
-            onClick={() => setCategory(cat.id)}
-          />
-        ))}
+      {/* Category filter */}
+      <div className="mb-3">
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="field sm:max-w-xs"
+          aria-label="Nach Kategorie filtern"
+        >
+          <option value="all">Alle ({counts.all})</option>
+          {CATEGORIES.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.emoji} {cat.label} ({counts[cat.id]})
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Title search (between categories and food-prep) + view toggle */}
@@ -127,14 +123,14 @@ export default function Overview({
           <ToggleBtn
             active={mode === 'gallery'}
             onClick={() => setMode('gallery')}
-            label="Gallery view"
+            label="Galerieansicht"
           >
             <GridIcon width={18} height={18} />
           </ToggleBtn>
           <ToggleBtn
             active={mode === 'list'}
             onClick={() => setMode('list')}
-            label="List view"
+            label="Listenansicht"
           >
             <ListIcon width={18} height={18} />
           </ToggleBtn>
@@ -161,7 +157,7 @@ export default function Overview({
           >
             {foodprepOnly && <CheckIcon width={13} height={13} />}
           </span>
-          {'\u{1F961}'} Perfect for food prep
+          {'\u{1F961}'} Ideal zum Vorkochen
           <span
             className={`text-xs rounded-full px-1.5 py-0.5 ${
               foodprepOnly ? 'bg-white/25' : 'bg-cream-200 text-cocoa-400'
@@ -221,29 +217,6 @@ export default function Overview({
   )
 }
 
-function Tab({ label, emoji, active, count, onClick, allTab }) {
-  return (
-    <button
-      onClick={onClick}
-      className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-all ${
-        active
-          ? 'bg-terracotta-500 text-white shadow-soft'
-          : 'bg-white/70 text-cocoa-600 hover:bg-white'
-      }`}
-    >
-      {!allTab && <span>{emoji}</span>}
-      {label}
-      <span
-        className={`text-xs rounded-full px-1.5 ${
-          active ? 'bg-white/25' : 'bg-cream-200 text-cocoa-400'
-        }`}
-      >
-        {count}
-      </span>
-    </button>
-  )
-}
-
 function ToggleBtn({ active, onClick, label, children }) {
   return (
     <button
@@ -286,13 +259,13 @@ function EmptyState({ hasRecipes, selected, query, onAdd }) {
     return (
       <div className="text-center py-20">
         <p className="text-5xl mb-3">{'\u{1F50D}'}</p>
-        <p className="text-cocoa-600 text-lg font-semibold">No matches</p>
+        <p className="text-cocoa-600 text-lg font-semibold">Keine Treffer</p>
         <p className="text-cocoa-400 mt-1">
           {query
-            ? `No recipe titled “${query}”.`
+            ? `Kein Rezept mit dem Titel „${query}“.`
             : selected.length
-              ? `No recipe contains ${selected.join(' + ')}.`
-              : 'Nothing in this category yet.'}
+              ? `Kein Rezept enthält ${selected.join(' + ')}.`
+              : 'In dieser Kategorie ist noch nichts.'}
         </p>
       </div>
     )
@@ -301,14 +274,14 @@ function EmptyState({ hasRecipes, selected, query, onAdd }) {
     <div className="text-center py-20">
       <p className="text-5xl mb-3">{'\u{1F373}'}</p>
       <p className="text-cocoa-600 text-lg font-semibold">
-        No recipes yet
+        Noch keine Rezepte
       </p>
       <p className="text-cocoa-400 mt-1 mb-5">
-        Add your first recipe and it'll show up here.
+        Füge dein erstes Rezept hinzu, dann erscheint es hier.
       </p>
       <button className="btn-primary" onClick={onAdd}>
         <PlusIcon width={18} height={18} />
-        Add a recipe
+        Rezept hinzufügen
       </button>
     </div>
   )

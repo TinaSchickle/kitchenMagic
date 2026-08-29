@@ -26,7 +26,7 @@ async function shareRecipeImage(node, title) {
     windowHeight: document.documentElement.offsetHeight,
   })
   const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'))
-  if (!blob) throw new Error('Could not create image')
+  if (!blob) throw new Error('Bild konnte nicht erstellt werden')
 
   const filename = `${(title || 'Rezept').replace(/[\\/:*?"<>|]+/g, ' ').trim()}.png`
   const file = new File([blob], filename, { type: 'image/png' })
@@ -82,7 +82,7 @@ export default function RecipeView({
       <div className="flex items-center justify-between gap-3 mb-4">
         <button className="btn-ghost" onClick={onBack}>
           <ArrowLeftIcon width={18} height={18} />
-          <span className="hidden sm:inline">All recipes</span>
+          <span className="hidden sm:inline">Alle Rezepte</span>
         </button>
         <div className="flex items-center gap-2">
           <button
@@ -99,7 +99,7 @@ export default function RecipeView({
               <BookmarkIcon width={18} height={18} />
             )}
             <span className="hidden sm:inline">
-              {isPlanned ? 'In planner' : 'Add to planner'}
+              {isPlanned ? 'Im Planer' : 'Zum Planer'}
             </span>
           </button>
           <button className="btn-ghost" onClick={handleShare} disabled={sharing}>
@@ -110,12 +110,12 @@ export default function RecipeView({
           </button>
           <button className="btn-ghost" onClick={onEdit}>
             <PencilIcon width={18} height={18} />
-            <span className="hidden sm:inline">Edit</span>
+            <span className="hidden sm:inline">Bearbeiten</span>
           </button>
           <button
             className="btn bg-white/70 text-terracotta-600 px-4 py-2 hover:bg-terracotta-50 shadow-soft"
             onClick={() => setConfirming(true)}
-            aria-label="Delete recipe"
+            aria-label="Rezept löschen"
           >
             <TrashIcon width={18} height={18} />
           </button>
@@ -145,16 +145,16 @@ export default function RecipeView({
                 )}
                 {recipe.foodprep && (
                   <span className="chip bg-terracotta-100 text-terracotta-700">
-                    {'\u{1F961}'} Food-prep friendly
+                    {'\u{1F961}'} Ideal zum Vorkochen
                   </span>
                 )}
               </div>
               <h1 className="font-display text-3xl sm:text-4xl font-semibold text-cocoa-800 leading-tight">
-                {recipe.title || 'Untitled recipe'}
+                {recipe.title || 'Rezept ohne Titel'}
               </h1>
             </div>
             <div className="flex-shrink-0">
-              <p className="text-sm text-cocoa-400 mb-1 sm:text-right">Portions</p>
+              <p className="text-sm text-cocoa-400 mb-1 sm:text-right">Portionen</p>
               {sharing ? (
                 <p className="text-lg font-semibold text-cocoa-800 sm:text-right">
                   {formatPortions(portions)}×
@@ -165,15 +165,14 @@ export default function RecipeView({
               {recipe.serves ? (
                 <p className="text-sm text-cocoa-600 mt-2 sm:text-right">
                   <span aria-hidden>{'\u{1F37D}️'} </span>
-                  Feeds {formatPortions(recipe.serves * portions)}{' '}
-                  {recipe.serves * portions === 1 ? 'person' : 'people'}
+                  Für {formatPortions(recipe.serves * portions)}{' '}
+                  {recipe.serves * portions === 1 ? 'Person' : 'Personen'}
                 </p>
               ) : null}
               {recipe.makes ? (
                 <p className="text-sm text-cocoa-600 mt-1 sm:text-right">
                   <span aria-hidden>{'\u{1F9C1}'} </span>
-                  Makes {formatPortions(recipe.makes * portions)}{' '}
-                  {recipe.makes * portions === 1 ? 'piece' : 'pieces'}
+                  Ergibt {formatPortions(recipe.makes * portions)} Stück
                 </p>
               ) : null}
             </div>
@@ -250,7 +249,7 @@ function IngredientList({ ingredients, portions }) {
           ))}
         </ul>
       ) : (
-        <p className="text-cocoa-400 text-sm italic">No ingredients</p>
+        <p className="text-cocoa-400 text-sm italic">Keine Zutaten</p>
       )}
     </section>
   )
@@ -282,7 +281,7 @@ function Step({ step, number, ingredients, portions }) {
           className="text-cocoa-800 leading-relaxed text-lg whitespace-pre-wrap"
         />
       ) : (
-        <p className="text-cocoa-400 text-sm italic">No steps written</p>
+        <p className="text-cocoa-400 text-sm italic">Keine Schritte angegeben</p>
       )}
     </section>
   )
@@ -301,26 +300,26 @@ function ConfirmDelete({ title, onCancel, onConfirm }) {
         <button
           onClick={onCancel}
           className="ml-auto block text-cocoa-400 hover:text-cocoa-600"
-          aria-label="Close"
+          aria-label="Schließen"
         >
           <XIcon />
         </button>
         <p className="text-4xl mb-2">{'\u{1F5D1}️'}</p>
         <h3 className="font-display text-xl font-semibold text-cocoa-800">
-          Delete this recipe?
+          Dieses Rezept löschen?
         </h3>
         <p className="text-cocoa-400 mt-1 mb-5">
-          “{title || 'Untitled recipe'}” will be gone for good.
+          „{title || 'Rezept ohne Titel'}“ ist dann für immer weg.
         </p>
         <div className="flex gap-3">
           <button className="btn-ghost flex-1" onClick={onCancel}>
-            Keep it
+            Behalten
           </button>
           <button
             className="btn bg-terracotta-500 text-white px-5 py-2.5 shadow-soft hover:bg-terracotta-600 flex-1"
             onClick={onConfirm}
           >
-            Delete
+            Löschen
           </button>
         </div>
       </div>

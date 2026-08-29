@@ -26,7 +26,7 @@ export default function App() {
       setPlanner(plan)
     } catch (err) {
       console.error(err)
-      setError(err.message || 'Could not load your recipes.')
+      setError(err.message || 'Deine Rezepte konnten nicht geladen werden.')
     } finally {
       setLoading(false)
     }
@@ -178,7 +178,7 @@ export default function App() {
       </main>
 
       <footer className="text-center text-sm text-cocoa-400 pb-8">
-        made with love by Tina
+        mit Liebe gemacht von Tina
       </footer>
     </div>
   )
@@ -187,9 +187,9 @@ export default function App() {
 function NotFound({ onBack }) {
   return (
     <div className="mt-16 text-center">
-      <p className="text-cocoa-600 text-lg">That recipe couldn't be found.</p>
+      <p className="text-cocoa-600 text-lg">Dieses Rezept wurde nicht gefunden.</p>
       <button className="btn-primary mt-4" onClick={onBack}>
-        Back to recipes
+        Zurück zu den Rezepten
       </button>
     </div>
   )

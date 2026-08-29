@@ -24,7 +24,7 @@ export default function PortionStepper({ value, onChange }) {
         onClick={() => set(value - 0.5)}
         disabled={value <= 1}
         className="grid place-items-center w-9 h-9 rounded-full text-cocoa-600 hover:bg-cream-100 disabled:opacity-40 disabled:hover:bg-transparent transition"
-        aria-label="Fewer portions"
+        aria-label="Weniger Portionen"
       >
         <MinusIcon width={18} height={18} />
       </button>
@@ -36,12 +36,12 @@ export default function PortionStepper({ value, onChange }) {
         value={formatPortions(value)}
         onChange={(e) => set(e.target.value)}
         className="w-14 text-center bg-transparent font-display text-xl font-semibold text-cocoa-800 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-        aria-label="Portion multiplier"
+        aria-label="Portionen-Faktor"
       />
       <button
         onClick={() => set(value + 0.5)}
         className="grid place-items-center w-9 h-9 rounded-full text-cocoa-600 hover:bg-cream-100 transition"
-        aria-label="More portions"
+        aria-label="Mehr Portionen"
       >
         <PlusIcon width={18} height={18} />
       </button>

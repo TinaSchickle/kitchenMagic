@@ -94,7 +94,7 @@ export async function saveRecipe(recipe) {
     }
     throw res.error
   }
-  throw new Error('Could not save recipe')
+  throw new Error('Rezept konnte nicht gespeichert werden')
 }
 
 export async function deleteRecipe(id) {

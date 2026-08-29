@@ -20,7 +20,7 @@ export default function IngredientFilter({
           className="flex items-center gap-2 font-semibold text-cocoa-700"
         >
           <FilterIcon width={18} height={18} className="text-cocoa-400" />
-          Filter by ingredient
+          Nach Zutat filtern
           {selected.length > 0 && (
             <span className="text-xs rounded-full px-1.5 py-0.5 bg-terracotta-100 text-terracotta-600">
               {selected.length}
@@ -37,7 +37,7 @@ export default function IngredientFilter({
             onClick={onClear}
             className="text-sm text-cocoa-400 hover:text-terracotta-500"
           >
-            clear
+            zurücksetzen
           </button>
         )}
       </div>
@@ -62,7 +62,8 @@ export default function IngredientFilter({
         <div className="mt-3 pt-3 border-t border-cream-200/70">
           {allIngredients.length === 0 ? (
             <p className="text-sm text-cocoa-400 py-2">
-              No ingredients yet — they'll appear here once you add recipes.
+              Noch keine Zutaten — sie erscheinen hier, sobald du Rezepte
+              hinzufügst.
             </p>
           ) : (
             <div className="max-h-64 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-1 pr-1">

@@ -53,7 +53,7 @@ export default function ShoppingList({ planner, recipes, onBack }) {
       <div className="flex items-center justify-between gap-3 mb-4">
         <button className="btn-ghost" onClick={onBack}>
           <ArrowLeftIcon width={18} height={18} />
-          Planner
+          Planer
         </button>
         {items.length > 0 && (
           <button className="btn-ghost" onClick={copy}>
@@ -62,7 +62,7 @@ export default function ShoppingList({ planner, recipes, onBack }) {
             ) : (
               <ClipboardIcon width={18} height={18} />
             )}
-            {copied ? 'Copied' : 'Copy'}
+            {copied ? 'Kopiert' : 'Kopieren'}
           </button>
         )}
       </div>
@@ -71,11 +71,11 @@ export default function ShoppingList({ planner, recipes, onBack }) {
         <div className="flex items-end justify-between mb-4">
           <div>
             <h1 className="font-display text-2xl sm:text-3xl font-semibold text-cocoa-800">
-              Shopping list
+              Einkaufsliste
             </h1>
             {items.length > 0 && (
               <p className="text-cocoa-400 mt-1">
-                {doneCount}/{items.length} in the basket
+                {doneCount}/{items.length} im Korb
               </p>
             )}
           </div>
@@ -84,7 +84,7 @@ export default function ShoppingList({ planner, recipes, onBack }) {
 
         {items.length === 0 ? (
           <p className="text-cocoa-400 py-8 text-center">
-            No ingredients yet — plan a recipe with ingredients first.
+            Noch keine Zutaten — plane zuerst ein Rezept mit Zutaten.
           </p>
         ) : (
           <ul className="divide-y divide-cream-200/70">

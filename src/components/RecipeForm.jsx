@@ -73,7 +73,7 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
       patch({ image: url })
     } catch (err) {
       console.error(err)
-      alert('Sorry, the image could not be added: ' + (err.message || err))
+      alert('Das Bild konnte nicht hinzugefügt werden: ' + (err.message || err))
     } finally {
       setUploading(false)
     }
@@ -94,7 +94,7 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
       await onSave(cleaned)
     } catch (err) {
       console.error(err)
-      alert('Could not save: ' + (err.message || err))
+      alert('Konnte nicht gespeichert werden: ' + (err.message || err))
       setSaving(false)
     }
   }
@@ -104,32 +104,34 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
       <div className="flex items-center justify-between mb-5">
         <button className="btn-ghost" onClick={onCancel}>
           <ArrowLeftIcon width={18} height={18} />
-          Cancel
+          Abbrechen
         </button>
-        <h1 className="font-display text-2xl font-semibold text-cocoa-800">
-          {isEdit ? 'Edit recipe' : 'New recipe'}
-        </h1>
+        {!isEdit && (
+          <h1 className="font-display text-2xl font-semibold text-cocoa-800">
+            Neues Rezept
+          </h1>
+        )}
         <button className="btn-primary" onClick={submit} disabled={!canSave}>
           <CheckIcon width={18} height={18} />
-          {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Speichern…' : 'Speichern'}
         </button>
       </div>
 
       {/* Basics */}
       <div className="card p-5 sm:p-6 mb-4">
         <label className="block text-sm font-bold text-cocoa-600 mb-1.5">
-          Title
+          Titel
         </label>
         <input
           value={recipe.title}
           onChange={(e) => patch({ title: e.target.value })}
-          placeholder="Grandma's zucchini fritters"
+          placeholder="Omas Zucchinipuffer"
           className="field font-display text-lg"
           autoFocus
         />
 
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
-          Category
+          Kategorie
         </label>
         <select
           value={recipe.category}
@@ -144,7 +146,7 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         </select>
 
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
-          Yield
+          Menge
         </label>
         <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
           <input
@@ -162,9 +164,9 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
             }
             placeholder="4"
             className="field w-20 text-center"
-            aria-label="Number of people this recipe feeds"
+            aria-label="Für wie viele Personen das Rezept reicht"
           />
-          <span className="text-cocoa-600">feeds people</span>
+          <span className="text-cocoa-600">für Personen</span>
           <span className="text-cocoa-400 px-1">/</span>
           <input
             type="number"
@@ -181,13 +183,13 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
             }
             placeholder="12"
             className="field w-20 text-center"
-            aria-label="Number of pieces this recipe makes"
+            aria-label="Wie viele Stück das Rezept ergibt"
           />
-          <span className="text-cocoa-600">makes pieces</span>
+          <span className="text-cocoa-600">ergibt Stück</span>
         </div>
         <p className="text-xs text-cocoa-400 mt-1">
-          At 1 portion. Both scale with the portion multiplier — leave a field
-          blank to hide it.
+          Bei 1 Portion. Beide Angaben skalieren mit dem Portionen-Faktor — ein
+          Feld leer lassen, um es auszublenden.
         </p>
 
         <label className="flex items-center gap-3 mt-5 cursor-pointer select-none w-fit">
@@ -201,7 +203,7 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
             {recipe.foodprep && <CheckIcon width={15} height={15} />}
           </span>
           <span className="text-sm font-bold text-cocoa-600">
-            {'\u{1F961}'} Perfect for food prep
+            {'\u{1F961}'} Ideal zum Vorkochen
           </span>
           <input
             type="checkbox"
@@ -212,7 +214,7 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         </label>
 
         <label className="block text-sm font-bold text-cocoa-600 mt-5 mb-2">
-          Photo
+          Foto
         </label>
         <ImagePicker
           image={recipe.image}
@@ -255,21 +257,21 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
                 }
                 placeholder="200 g"
                 className="field w-24 flex-shrink-0 px-2.5 py-2 text-center"
-                aria-label="Amount (optional)"
+                aria-label="Menge (optional)"
               />
               <input
                 value={ing.name}
                 onChange={(e) => updateIngredient(ing.id, { name: e.target.value })}
                 placeholder="Mehl"
                 className="field px-3 py-2"
-                aria-label="Ingredient"
+                aria-label="Zutat"
               />
               <button
                 onClick={() =>
                   updateIngredient(ing.id, { optional: !ing.optional })
                 }
                 aria-pressed={Boolean(ing.optional)}
-                aria-label="Mark as optional"
+                aria-label="Als optional markieren"
                 title="Optional"
                 className={`flex-shrink-0 text-xs font-bold px-2.5 py-2 rounded-xl transition ${
                   ing.optional
@@ -282,7 +284,7 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
               <button
                 onClick={() => removeIngredient(ing.id)}
                 className="text-cocoa-400 hover:text-terracotta-500 p-1 flex-shrink-0"
-                aria-label="Remove ingredient"
+                aria-label="Zutat entfernen"
               >
                 <XIcon width={16} height={16} />
               </button>
@@ -294,10 +296,10 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
           className="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-sage-600 hover:text-sage-600/80"
         >
           <PlusIcon width={16} height={16} />
-          Add ingredient
+          Zutat hinzufügen
         </button>
         <p className="text-xs text-cocoa-400 mt-2">
-          Amount is optional — leave it blank for things like "salt".
+          Die Menge ist optional — für Dinge wie „Salz“ einfach leer lassen.
         </p>
       </section>
 
@@ -321,19 +323,23 @@ export default function RecipeForm({ initial, onCancel, onSave }) {
         className="btn-soft w-full mt-4 py-3 border-2 border-dashed border-sage-300 bg-sage-50 hover:bg-sage-100"
       >
         <PlusIcon width={18} height={18} />
-        Add step
+        Schritt hinzufügen
       </button>
 
       {/* Bottom save for long forms */}
       <div className="mt-6 flex justify-end">
         <button className="btn-primary" onClick={submit} disabled={!canSave}>
           <CheckIcon width={18} height={18} />
-          {saving ? 'Saving…' : isEdit ? 'Save changes' : 'Save recipe'}
+          {saving
+            ? 'Speichern…'
+            : isEdit
+              ? 'Änderungen speichern'
+              : 'Rezept speichern'}
         </button>
       </div>
       {!recipe.title.trim() && (
         <p className="text-sm text-cocoa-400 text-right mt-2">
-          Add a title to save.
+          Titel eingeben, um zu speichern.
         </p>
       )}
     </div>
@@ -349,7 +355,7 @@ function ImagePicker({ image, uploading, onPick, onRemove }) {
           <button
             onClick={onRemove}
             className="absolute top-2 right-2 grid place-items-center w-9 h-9 rounded-full bg-cocoa-800/60 text-white hover:bg-cocoa-800 backdrop-blur"
-            aria-label="Remove photo"
+            aria-label="Foto entfernen"
           >
             <XIcon width={18} height={18} />
           </button>
@@ -360,9 +366,9 @@ function ImagePicker({ image, uploading, onPick, onRemove }) {
             <CameraIcon />
           </span>
           <span className="text-cocoa-600 font-semibold">
-            {uploading ? 'Uploading…' : 'Add a photo'}
+            {uploading ? 'Wird hochgeladen…' : 'Foto hinzufügen'}
           </span>
-          <span className="text-xs text-cocoa-400">tap to choose an image</span>
+          <span className="text-xs text-cocoa-400">zum Auswählen tippen</span>
           <input
             type="file"
             accept="image/*"
@@ -435,14 +441,14 @@ function StepEditor({
             {number}
           </span>
           <span className="text-sm font-bold text-cocoa-600">
-            Step {number}
+            Schritt {number}
           </span>
         </div>
         {canRemove && (
           <button
             onClick={onRemoveStep}
             className="text-cocoa-400 hover:text-terracotta-500 p-1"
-            aria-label={`Remove step ${number}`}
+            aria-label={`Schritt ${number} entfernen`}
           >
             <TrashIcon width={18} height={18} />
           </button>

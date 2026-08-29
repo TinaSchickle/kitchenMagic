@@ -23,7 +23,7 @@ export function buildShoppingList(planner, recipes) {
       const item = map.get(key)
       const amount = scaleAmount(ing.amount, entry.portions)
       if (amount && amount.trim()) item.amounts.push(amount.trim())
-      item.sources.add(recipe.title || 'Untitled recipe')
+      item.sources.add(recipe.title || 'Rezept ohne Titel')
     }
   }
 

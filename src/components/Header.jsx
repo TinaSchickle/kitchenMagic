@@ -17,7 +17,7 @@ export default function Header({
         <button
           onClick={onLogoClick}
           className="flex items-center gap-2 group flex-shrink-0"
-          aria-label="Go to all recipes"
+          aria-label="Zu allen Rezepten"
         >
           <img
             src="icons/icon-192.png"
@@ -35,13 +35,13 @@ export default function Header({
               active={view === 'overview'}
               onClick={() => onNavigate('overview')}
               icon={<BookIcon width={18} height={18} />}
-              label="Recipes"
+              label="Rezepte"
             />
             <NavItem
               active={view === 'planner' || view === 'shopping'}
               onClick={() => onNavigate('planner')}
               icon={<CalendarIcon width={18} height={18} />}
-              label="Planner"
+              label="Planer"
               badge={plannerCount}
             />
           </nav>
@@ -52,20 +52,20 @@ export default function Header({
             className="hidden md:inline-flex chip bg-white/70 text-cocoa-400 text-xs"
             title={
               isCloud
-                ? 'Synced across your devices via Supabase'
-                : 'Saved on this device — connect Supabase for cross-device sync'
+                ? 'Über Supabase auf allen Geräten synchronisiert'
+                : 'Auf diesem Gerät gespeichert — Supabase verbinden für Geräte-Sync'
             }
           >
             <span
               className={`w-2 h-2 rounded-full ${isCloud ? 'bg-sage-400' : 'bg-terracotta-300'}`}
             />
-            {isCloud ? 'Synced' : 'On this device'}
+            {isCloud ? 'Synchronisiert' : 'Auf diesem Gerät'}
           </span>
 
           {showAdd && (
             <button className="btn-primary px-3 sm:px-5" onClick={onAdd}>
               <PlusIcon width={18} height={18} />
-              <span className="hidden sm:inline">New recipe</span>
+              <span className="hidden sm:inline">Neues Rezept</span>
             </button>
           )}
         </div>
