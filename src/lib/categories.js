@@ -5,7 +5,7 @@ export const CATEGORIES = [
   { id: 'sweet', label: 'Süßes', emoji: '\u{1F370}' }, // 🍰
   { id: 'party', label: 'Party', emoji: '\u{1F389}' }, // 🎉
   { id: 'thyroid', label: 'Schilddrüse', emoji: '\u{1F98B}' }, // 🦋
-  { id: 'try', label: 'Ausprobieren', emoji: '\u{1F9EA}' }, // 🧪 — noch nicht getestet
+  { id: 'try', label: 'Try', emoji: '\u{1F9EA}' }, // 🧪 — noch nicht getestet
   // hiddenFromAll: kein Essen, daher vom Tab „Alle“ ausgenommen — nur
   // sichtbar, wenn der Tab „Selbermachen“ selbst gewählt ist.
   { id: 'diy', label: 'Selbermachen', emoji: '\u{1F9F9}', hiddenFromAll: true }, // 🧹
