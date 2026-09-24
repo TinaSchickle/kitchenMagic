@@ -1,43 +1,69 @@
 name: Supabase wachhalten
 
 # Der kostenlose Supabase-Tarif pausiert ein Projekt nach 7 Tagen ohne
-# Aktivität. Dieser Job tippt die Datenbank alle 3 Tage einmal an, damit sie
-# nie einschläft. Dieses Supabase-Projekt (wscuovmzdbhwugxsgfjw) wird nicht
-# nur von kitchenMagic genutzt, sondern auch von Mood und Edersee Kasse –
-# ein Ping von hier hält es für alle drei wach. Läuft auf GitHubs Servern,
-# völlig unabhängig von deinen Geräten.
+# Aktivität. Dieses Supabase-Projekt (wscuovmzdbhwugxsgfjw) wird nicht nur von
+# kitchenMagic genutzt, sondern auch von Mood, Edersee Kasse und PaceUp –
+# ein Ping von hier hält es für alle wach. Läuft auf GitHubs Servern, völlig
+# unabhängig von deinen Geräten.
+#
+# Lehre aus der Pause am 24.09.2026: Ein reiner Lese-Ping alle 3 Tage hat
+# NICHT gereicht (letzter grüner Lauf war 2 Tage vorher). Deshalb jetzt:
+#   - zweimal täglich statt alle 3 Tage (GitHub verschluckt Cron-Läufe
+#     gelegentlich; so gibt es reichlich Puffer),
+#   - zusätzlich ein echter Schreibzugriff (Tabelle `keepalive`, siehe
+#     supabase/keepalive.sql),
+#   - jede Antwort außer 2xx lässt den Job fehlschlagen (vorher gingen 4xx
+#     wie 401/404 still als „Erfolg" durch). Ein roter Lauf löst eine
+#     GitHub-Mail aus – dann sofort nachsehen.
 
 on:
   schedule:
-    - cron: '32 7 */3 * *' # alle 3 Tage um 07:32 UTC
+    - cron: '32 7 * * *'   # täglich 07:32 UTC
+    - cron: '17 19 * * *'  # täglich 19:17 UTC (Reserve)
   workflow_dispatch: # erlaubt manuelles Auslösen zum Testen
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Datenbank antippen
+      - name: Datenbank antippen (lesen + schreiben)
         env:
           SUPABASE_URL: https://wscuovmzdbhwugxsgfjw.supabase.co
           SUPABASE_ANON_KEY: sb_publishable_eAz7id9uPfkRq0wTll_UFA_HaR9JMj1
         run: |
-          # Eine leichte REST-Anfrage genügt als Aktivität. Dieses Projekt hat
-          # kein RLS (öffentlicher Datensatz), daher liefert ein gültiger Ping
-          # normalerweise 200 mit Daten.
-          # --fail-with-body würde bei 4xx/5xx selbst fehlschlagen; wir werten
-          # den Code aber manuell aus.
-          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 \
-            "$SUPABASE_URL/rest/v1/recipes?select=id&limit=1" \
-            -H "apikey: $SUPABASE_ANON_KEY") || code="curl-error"
-          echo "HTTP $code"
-          # "000" oder ein nicht-numerischer Wert heißt: curl kam gar nicht erst
-          # durch (DNS/Timeout/Verbindung verweigert) – genau das Symptom eines
-          # pausierten Projekts. Das darf NICHT als Erfolg durchgehen.
-          if ! [ "$code" -eq "$code" ] 2>/dev/null || [ "$code" = "000" ]; then
-            echo "Keine Verbindung zustande gekommen – Projekt evtl. pausiert oder DNS/Netzwerkfehler."
-            exit 1
-          fi
-          if [ "$code" -ge 500 ]; then
-            echo "Server-Fehler – Projekt evtl. pausiert."
-            exit 1
-          fi
+          fail=0
+
+          # Führt eine Anfrage aus und verlangt einen 2xx-Status. "000" heißt:
+          # curl kam gar nicht durch (DNS/Timeout/Verbindung verweigert) –
+          # genau das Symptom eines pausierten Projekts.
+          check() {
+            label="$1"; shift
+            code=$(curl -s -o /tmp/body -w "%{http_code}" --max-time 20 \
+              --retry 3 --retry-delay 10 --retry-all-errors "$@") || true
+            echo "$label → HTTP ${code:-leer}"
+            case "$code" in
+              2??) ;;
+              *)
+                echo "::error::$label fehlgeschlagen (HTTP ${code:-leer}) – Projekt evtl. pausiert, Key/Tabelle geändert oder Netzwerkfehler."
+                head -c 500 /tmp/body 2>/dev/null; echo
+                fail=1 ;;
+            esac
+          }
+
+          auth=(-H "apikey: $SUPABASE_ANON_KEY" -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+
+          # 1) Lesen aus den echten App-Tabellen
+          check "recipes lesen" "${auth[@]}" \
+            "$SUPABASE_URL/rest/v1/recipes?select=id&limit=1"
+          check "planner lesen" "${auth[@]}" \
+            "$SUPABASE_URL/rest/v1/planner?select=*&limit=1"
+
+          # 2) Echter Schreibzugriff: Zeitstempel in keepalive (id = 1) upserten
+          now=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          check "keepalive schreiben" "${auth[@]}" \
+            -X POST "$SUPABASE_URL/rest/v1/keepalive?on_conflict=id" \
+            -H "Content-Type: application/json" \
+            -H "Prefer: resolution=merge-duplicates,return=minimal" \
+            -d "{\"id\":1,\"source\":\"github-actions\",\"pinged_at\":\"$now\"}"
+
+          exit $fail
