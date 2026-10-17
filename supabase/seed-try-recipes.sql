@@ -13,7 +13,7 @@ values
     {"id":"nb-i02","amount":"50 g","name":"Mandeln","optional":false},
     {"id":"nb-i03","amount":"50 g","name":"Pistazien","optional":false},
     {"id":"nb-i04","amount":"125 g","name":"ungesalzene Butter oder Kokosöl, geschmolzen","optional":false},
-    {"id":"nb-i05","amount":"1 cup","name":"Milch nach Wahl (Karamell)","optional":false},
+    {"id":"nb-i05","amount":"240 ml","name":"Milch nach Wahl (Karamell)","optional":false},
     {"id":"nb-i06","amount":"1 EL","name":"Vanilleextrakt","optional":false},
     {"id":"nb-i07","amount":"2 EL","name":"Tahini oder Nussbutter","optional":false},
     {"id":"nb-i08","amount":"800 g","name":"Datteln, entsteint","optional":false},
